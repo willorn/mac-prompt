@@ -3,6 +3,7 @@ const CHROME_EXTENSION_URL = chrome.runtime.getURL("index.html");
 const BACKUP_FILENAME_REGEX =
   "prompt-master/backups/prompts_backup_.*\\.json$";
 const BACKUP_MAX_COUNT = 5;
+const BACKUP_KEYS = ["myPrompts", "lastBackupHash"];
 
 // 辅助：根据当前窗口位置保存下次打开的坐标
 function persistWindowBounds(win) {
@@ -56,6 +57,15 @@ function buildBackupFilename() {
   return `prompt-master/backups/prompts_backup_${stamp}.json`;
 }
 
+// 计算提示词数据的哈希，用于判断是否有变化
+async function hashPrompts(dataStr) {
+  const enc = new TextEncoder().encode(dataStr);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 // 清理旧备份，最多保留 BACKUP_MAX_COUNT 个
 async function pruneBackups() {
   try {
@@ -88,8 +98,14 @@ async function pruneBackups() {
 // 开机自动备份：写入 Downloads/prompt-master/backups 下，并清理旧文件
 async function autoBackupPrompts() {
   try {
-    const { myPrompts = [] } = await chrome.storage.local.get(["myPrompts"]);
+    const { myPrompts = [], lastBackupHash = null } =
+      await chrome.storage.local.get(BACKUP_KEYS);
     const data = JSON.stringify(myPrompts, null, 2);
+
+    // 数据未变化则跳过，避免频繁下载提示
+    const currentHash = await hashPrompts(data);
+    if (currentHash === lastBackupHash) return;
+
     const filename = buildBackupFilename();
 
     await chrome.downloads.download({
@@ -99,6 +115,10 @@ async function autoBackupPrompts() {
       saveAs: false,
     });
 
+    await chrome.storage.local.set({
+      lastBackupHash: currentHash,
+      lastBackupTime: Date.now(),
+    });
     await pruneBackups();
   } catch (err) {
     console.error("autoBackupPrompts failed", err);
