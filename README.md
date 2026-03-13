@@ -51,4 +51,28 @@ zip -r prompt-master.zip . -x '*.git*' -x '.idea/*' -x 'prompt-master.zip'
 - 丢失风险：清空浏览器数据、卸载扩展或更换设备时，数据会被移除。
 - 备份方法：在插件界面右上角点击「导出」，会生成 `prompts_backup.json`；建议定期备份到安全位置或云盘。
 - 恢复方法：点击「导入」，选择之前导出的 `prompts_backup.json` 即可恢复。
-- 升级/重新加载扩展：只要不清空浏览器数据，提示词会自动保留；若担心丢失，先导出备份再操作。  
+- 升级/重新加载扩展：只要不清空浏览器数据，提示词会自动保留；若担心丢失，先导出备份再操作。
+
+## Electron 桌面版（推荐）
+
+仓库新增了 `electron-app/`，用于桌面端实现。
+
+运行方式（Bun）：
+
+```bash
+cd electron-app
+bun install
+bun run dev
+```
+
+> 注意：首次运行可能需要安装 Xcode Command Line Tools。
+
+打包：
+
+```bash
+cd electron-app
+bun run build
+```
+
+输出目录：`electron-app/dist`。
+

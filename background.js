@@ -168,7 +168,7 @@ async function openOrFocusWindow() {
   createPromptWindow();
 }
 
-// 快捷键触发：支持 Alt+E 切换打开/关闭；已存在时直接静默关闭（不先聚焦）
+// 快捷键触发：切换显示/隐藏窗口（最小化/恢复），不关闭
 async function toggleWindowWithShortcut() {
   const existingTab = await findExistingTab();
 
@@ -176,12 +176,20 @@ async function toggleWindowWithShortcut() {
     try {
       const win = await chrome.windows.get(existingTab.windowId);
 
-      // 无论是否聚焦，只要已存在就直接关闭，避免全局快捷键先唤醒浏览器
-      if (win.type === "popup") {
-        await closeWindowSilently(win.id);
+      // 如果窗口已最小化，则恢复并聚焦
+      if (win.state === "minimized") {
+        await chrome.windows.update(win.id, {
+          state: "normal",
+          focused: true
+        });
+        chrome.tabs.sendMessage(existingTab.id, { action: "FOCUS_SEARCH" });
       } else {
+        // 如果窗口正常显示，则最小化隐藏
         persistWindowBounds(win);
-        await chrome.tabs.remove(existingTab.id);
+        await chrome.windows.update(win.id, {
+          state: "minimized",
+          focused: false
+        });
       }
       return;
     } catch (error) {
