@@ -233,9 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.className = "card";
         if (item.isPinned) {
-          card.style.border = "2px solid #2563eb";
-          card.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.15)";
-          card.style.backgroundColor = "#f8faff";
+          card.style.border = "2px solid #2a7b59";
+          card.style.boxShadow = "0 4px 12px rgba(42, 123, 89, 0.18)";
+          card.style.backgroundColor = "#f3faf6";
           card.classList.add("pinned-card");
         }
 
@@ -261,13 +261,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div class="card-header">
             <span class="card-tag">${item.tag || "默认"}</span>
-            <div style="display: flex; gap: 8px;">
-              <button class="copy-btn" title="复制并最小化窗口" data-index="${item.originalIndex}" style="border:none; background:none; cursor:pointer; color: #94a3b8;">📋</button>
-              <button class="pin-btn" data-index="${item.originalIndex}" style="border:none; background:none; cursor:pointer; color: ${item.isPinned ? "#2563eb" : "#94a3b8"};">📌</button>
-              <button class="edit-btn" data-index="${item.originalIndex}" style="border:none; background:none; cursor:pointer; color: #94a3b8;">✏️</button>
-              <button class="delete-btn" data-index="${item.originalIndex}" style="border:none; background:none; cursor:pointer; color: #94a3b8;">🗑️</button>
+            <div class="card-actions">
+              <button class="copy-btn" title="复制并隐藏" data-index="${item.originalIndex}">📋</button>
+              <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#2a7b59" : "#8a988f"};">📌</button>
+              <button class="edit-btn" data-index="${item.originalIndex}">✏️</button>
+              <button class="delete-btn" data-index="${item.originalIndex}">🗑️</button>
             </div>
           </div>
           <div class="card-title">${item.name}</div>
@@ -290,13 +290,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          card.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.2)";
+          card.style.boxShadow = "0 0 0 3px rgba(42, 123, 89, 0.2)";
           setTimeout(() => (card.style.boxShadow = ""), 500);
-          showToast("已复制，窗口即将最小化");
+          showToast("已复制，窗口已隐藏");
 
-          card.style.backgroundColor = "#e0f2fe";
+          card.style.backgroundColor = "rgba(42, 123, 89, 0.12)";
           setTimeout(() => {
-            card.style.backgroundColor = item.isPinned ? "#f0f7ff" : "white";
+            card.style.backgroundColor = item.isPinned ? "rgba(42, 123, 89, 0.08)" : "white";
           }, 200);
 
           closeCurrentWindowSilently();
@@ -343,10 +343,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const card = btn.closest(".card");
         if (card) {
-          card.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.2)";
+          card.style.boxShadow = "0 0 0 3px rgba(42, 123, 89, 0.2)";
           setTimeout(() => (card.style.boxShadow = ""), 500);
         }
-        showToast("已复制，窗口即将最小化");
+        showToast("已复制，窗口已隐藏");
         closeCurrentWindowSilently();
       };
     });
