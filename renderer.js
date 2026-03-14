@@ -82,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewTitle = document.getElementById("previewTitle");
   const previewBody = document.getElementById("previewBody");
   const previewTag = document.getElementById("previewTag");
-  const previewCopy = document.getElementById("previewCopy");
   const previewEdit = document.getElementById("previewEdit");
   const resultCount = document.getElementById("resultCount");
 
@@ -104,11 +103,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const webdavConfigJson = document.getElementById("webdavConfigJson");
   const webdavRestorePath = document.getElementById("webdavRestorePath");
   const webdavTest = document.getElementById("webdavTest");
+  const webdavAutoBackup = document.getElementById("webdavAutoBackup");
+  const webdavIntervalDays = document.getElementById("webdavIntervalDays");
+  const webdavBackupList = document.getElementById("webdavBackupList");
+  const webdavRefresh = document.getElementById("webdavRefresh");
   const webdavCopyConfig = document.getElementById("webdavCopyConfig");
-  const webdavApplyConfig = document.getElementById("webdavApplyConfig");
+  const webdavPasteConfig = document.getElementById("webdavPasteConfig");
   const webdavBackup = document.getElementById("webdavBackup");
   const webdavRestore = document.getElementById("webdavRestore");
   const webdavClose = document.getElementById("webdavClose");
+
+  // Copy/Paste Config Modal Elements
+  const copyConfigOverlay = document.getElementById("copyConfigOverlay");
+  const copyConfigClose = document.getElementById("copyConfigClose");
+  const copyConfigText = document.getElementById("copyConfigText");
+  const copyConfigBtn = document.getElementById("copyConfigBtn");
+  const pasteConfigOverlay = document.getElementById("pasteConfigOverlay");
+  const pasteConfigClose = document.getElementById("pasteConfigClose");
+  const pasteConfigCancel = document.getElementById("pasteConfigCancel");
+  const pasteConfigText = document.getElementById("pasteConfigText");
+  const pasteConfigApply = document.getElementById("pasteConfigApply");
 
   let allPrompts = [];
   let editingIndex = null;
@@ -160,6 +174,30 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     await electronAPI.setWebdavConfig(config);
     return config;
+  }
+
+  function renderWebdavBackups(list) {
+    if (!webdavBackupList) return;
+    webdavBackupList.innerHTML = "";
+    if (!Array.isArray(list) || list.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "暂无备份";
+      webdavBackupList.appendChild(opt);
+      return;
+    }
+    list.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.path;
+      opt.textContent = `${item.name} (${item.lastMod})`;
+      webdavBackupList.appendChild(opt);
+    });
+  }
+
+  async function loadWebdavBackups() {
+    if (!electronAPI?.listWebdavBackups) return;
+    const list = await electronAPI.listWebdavBackups();
+    renderWebdavBackups(list);
   }
 
   function openWebdavModal() {
@@ -389,7 +427,6 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="card-meta">
                 <span class="card-tag">${item.tag || "默认"}</span>
               </span>
-              <button class="copy-btn" title="复制并隐藏" data-index="${item.originalIndex}">Copy</button>
               <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
               <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
               <button class="delete-btn" data-index="${item.originalIndex}">Del</button>
@@ -399,7 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         card.onclick = async (e) => {
           if (
-            ["pin-btn", "edit-btn", "delete-btn", "copy-btn"].some((cls) =>
+            ["pin-btn", "edit-btn", "delete-btn"].some((cls) =>
               e.target.classList.contains(cls),
             )
           ) {
@@ -460,29 +497,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const idx = Number(btn.dataset.index);
         allPrompts[idx].isPinned = !allPrompts[idx].isPinned;
         await saveData();
-      };
-    });
-
-    document.querySelectorAll(".copy-btn").forEach((btn) => {
-      btn.onclick = async (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.index);
-        const data = allPrompts[idx];
-        if (!data) return;
-
-        const copied = await copyText(data.content);
-        if (!copied) {
-          showToast("复制失败，请手动复制");
-          return;
-        }
-
-        const card = btn.closest(".card");
-        if (card) {
-          card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
-          setTimeout(() => (card.style.boxShadow = ""), 500);
-        }
-        showToast("已复制，窗口已隐藏");
-        closeCurrentWindowSilently();
       };
     });
 
@@ -593,8 +607,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   if (menuWebdav) menuWebdav.onclick = () => {
-    openWebdavModal();
-    if (moreMenu) moreMenu.style.display = "none";
+    (async () => {
+      openWebdavModal();
+      if (moreMenu) moreMenu.style.display = "none";
+      const config = await loadWebdavConfig();
+      if (config) {
+        if (webdavUrl) webdavUrl.value = config.url || "";
+        if (webdavUsername) webdavUsername.value = config.username || "";
+        if (webdavPassword) webdavPassword.value = config.password || "";
+        if (webdavDir) webdavDir.value = config.directory || "prompt-master-backups";
+        if (webdavConfigJson) {
+          webdavConfigJson.value = JSON.stringify(buildWebdavSnapshot(config), null, 2);
+        }
+      }
+      if (electronAPI?.getWebdavSettings) {
+        const settings = await electronAPI.getWebdavSettings();
+        if (webdavAutoBackup) webdavAutoBackup.checked = !!settings?.autoBackupEnabled;
+        if (webdavIntervalDays) webdavIntervalDays.value = String(settings?.intervalDays ?? 3);
+      }
+      await loadWebdavBackups();
+    })();
   };
 
   if (menuImport) menuImport.onclick = async () => {
@@ -619,19 +651,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (moreMenu) moreMenu.style.display = "none";
   };
 
-  if (previewCopy) {
-    previewCopy.onclick = async () => {
-      if (selectedIndex === null) return;
-      const item = allPrompts[selectedIndex];
-      if (!item) return;
-      const copied = await copyText(item.content);
-      if (copied) {
-        showToast("已复制，窗口已隐藏");
-        closeCurrentWindowSilently();
-      }
-    };
-  }
-
   if (previewEdit) {
     previewEdit.onclick = () => {
       if (selectedIndex === null) return;
@@ -646,7 +665,198 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-    window.addEventListener("load", () => {
+  if (webdavClose) {
+    webdavClose.onclick = () => closeWebdavModal();
+  }
+
+  if (webdavOverlay) {
+    webdavOverlay.addEventListener("click", (e) => {
+      if (e.target === webdavOverlay) closeWebdavModal();
+    });
+  }
+
+  if (webdavRefresh) {
+    webdavRefresh.onclick = async () => {
+      try {
+        await saveWebdavConfig();
+        await loadWebdavBackups();
+        showToast("已刷新");
+      } catch (err) {
+        alert(`刷新失败: ${err}`);
+      }
+    };
+  }
+
+  if (webdavTest) {
+    webdavTest.onclick = async () => {
+      try {
+        await saveWebdavConfig();
+        await electronAPI.testWebdav();
+        showToast("WebDAV 连接成功");
+      } catch (err) {
+        alert(`连接失败: ${err}`);
+      }
+    };
+  }
+
+  if (webdavBackup) {
+    webdavBackup.onclick = async () => {
+      try {
+        await saveWebdavConfig();
+        const result = await electronAPI.backupWebdav();
+        if (result?.fileName) {
+          showToast(`已备份：${result.fileName}`);
+        } else {
+          showToast("已备份");
+        }
+      } catch (err) {
+        alert(`备份失败: ${err}`);
+      }
+    };
+  }
+
+  if (webdavRestore) {
+    webdavRestore.onclick = async () => {
+      try {
+        await saveWebdavConfig();
+        if (!confirm("将从 WebDAV 恢复，当前本地内容将被覆盖。继续吗？")) {
+          return;
+        }
+        let result;
+        const path = webdavRestorePath?.value?.trim();
+        const selected = webdavBackupList?.value;
+        if (path) {
+          result = await electronAPI.restoreWebdavPath(path);
+        } else if (selected) {
+          result = await electronAPI.restoreWebdavPath(selected);
+        } else {
+          result = await electronAPI.restoreWebdavLatest();
+        }
+        allPrompts = await loadPrompts();
+        renderAll();
+        showToast(`已恢复 ${result?.promptsCount ?? 0} 条`);
+      } catch (err) {
+        alert(`恢复失败: ${err}`);
+      }
+    };
+  }
+
+  const intervalField = document.getElementById("intervalField");
+  
+  function updateIntervalFieldVisibility() {
+    if (intervalField) {
+      intervalField.style.display = webdavAutoBackup?.checked ? "block" : "none";
+    }
+  }
+  
+  if (webdavAutoBackup || webdavIntervalDays) {
+    const saveSettings = async () => {
+      if (!electronAPI?.setWebdavSettings) return;
+      const enabled = !!webdavAutoBackup?.checked;
+      const days = Number(webdavIntervalDays?.value || 3);
+      await electronAPI.setWebdavSettings({
+        autoBackupEnabled: enabled,
+        intervalDays: Math.max(1, Math.min(days, 30)),
+      });
+      updateIntervalFieldVisibility();
+    };
+    if (webdavAutoBackup) {
+      webdavAutoBackup.onchange = saveSettings;
+      // Initialize visibility
+      updateIntervalFieldVisibility();
+    }
+    if (webdavIntervalDays) webdavIntervalDays.onchange = saveSettings;
+  }
+
+  // Copy Config Modal Functions
+  function openCopyConfigModal() {
+    if (!copyConfigOverlay || !copyConfigText) return;
+    const config = collectWebdavConfig();
+    const json = JSON.stringify(buildWebdavSnapshot(config), null, 2);
+    copyConfigText.value = json;
+    copyConfigOverlay.style.display = "flex";
+  }
+
+  function closeCopyConfigModal() {
+    if (copyConfigOverlay) copyConfigOverlay.style.display = "none";
+  }
+
+  // Paste Config Modal Functions
+  function openPasteConfigModal() {
+    if (!pasteConfigOverlay) return;
+    if (pasteConfigText) pasteConfigText.value = "";
+    pasteConfigOverlay.style.display = "flex";
+  }
+
+  function closePasteConfigModal() {
+    if (pasteConfigOverlay) pasteConfigOverlay.style.display = "none";
+  }
+
+  async function applyPastedConfig() {
+    try {
+      const raw = pasteConfigText?.value?.trim();
+      if (!raw) {
+        alert("请粘贴配置 JSON");
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      const cfg = parsed.webdavConfig || {};
+      let url = cfg.url || "";
+      if (typeof url === "string" && url.includes("jianguoyun-dav-proxy")) {
+        url = "https://dav.jianguoyun.com/dav/";
+      }
+      if (webdavUrl) webdavUrl.value = url;
+      if (webdavUsername) webdavUsername.value = cfg.username || "";
+      if (webdavPassword) webdavPassword.value = cfg.password || "";
+      if (webdavDir) webdavDir.value = cfg.directory || "prompt-master";
+      await saveWebdavConfig();
+      closePasteConfigModal();
+      showToast("配置已应用");
+    } catch (err) {
+      alert(`解析失败: ${err}`);
+    }
+  }
+
+  // Copy Config Button
+  if (webdavCopyConfig) {
+    webdavCopyConfig.onclick = openCopyConfigModal;
+  }
+
+  // Paste Config Button
+  if (webdavPasteConfig) {
+    webdavPasteConfig.onclick = openPasteConfigModal;
+  }
+
+  // Copy Config Modal Events
+  if (copyConfigClose) copyConfigClose.onclick = closeCopyConfigModal;
+  if (copyConfigOverlay) {
+    copyConfigOverlay.onclick = (e) => {
+      if (e.target === copyConfigOverlay) closeCopyConfigModal();
+    };
+  }
+  if (copyConfigBtn) {
+    copyConfigBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(copyConfigText?.value || "");
+        showToast("已复制到剪贴板");
+        closeCopyConfigModal();
+      } catch (err) {
+        alert(`复制失败: ${err}`);
+      }
+    };
+  }
+
+  // Paste Config Modal Events
+  if (pasteConfigClose) pasteConfigClose.onclick = closePasteConfigModal;
+  if (pasteConfigCancel) pasteConfigCancel.onclick = closePasteConfigModal;
+  if (pasteConfigOverlay) {
+    pasteConfigOverlay.onclick = (e) => {
+      if (e.target === pasteConfigOverlay) closePasteConfigModal();
+    };
+  }
+  if (pasteConfigApply) pasteConfigApply.onclick = applyPastedConfig;
+
+  window.addEventListener("load", () => {
     searchInput.focus();
   });
 
@@ -654,6 +864,16 @@ document.addEventListener("DOMContentLoaded", () => {
     electronAPI.onFocusSearch(() => {
       searchInput.focus();
       searchInput.select();
+    });
+  }
+
+  if (electronAPI?.onAutoBackup) {
+    electronAPI.onAutoBackup((fileName) => {
+      if (fileName) {
+        showToast(`已自动备份：${fileName}`);
+      } else {
+        showToast("已自动备份");
+      }
     });
   }
 });

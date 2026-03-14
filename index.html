@@ -95,23 +95,53 @@
 
       .search-input {
         width: 100%;
-        max-width: 560px;
-        padding: 8px 12px;
-        background-color: #f2f2f4;
-        border: 1px solid var(--border);
-        border-radius: 12px;
+        max-width: 400px;
+        padding: 7px 12px 7px 32px;
+        background: rgba(120, 120, 128, 0.12);
+        border: none;
+        border-radius: 10px;
         outline: none;
         font-size: 13px;
-        transition: border 0.2s ease, box-shadow 0.2s ease;
+        color: var(--text);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+      }
+
+      .search-input::placeholder {
+        color: var(--muted);
       }
 
       .search-input:focus {
-        border-color: #cdd9f7;
-        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.14);
+        background: rgba(120, 120, 128, 0.16);
+        box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.12);
+      }
+
+      .search-wrapper {
+        position: relative;
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 36px;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-wrapper::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.3-4.3'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        opacity: 0.8;
       }
 
       #clearSearchBtn:hover {
-        color: #505055 !important;
+        background: rgba(120, 120, 128, 0.36) !important;
         transform: scale(1.05);
       }
 
@@ -437,6 +467,102 @@
         border-radius: 6px;
       }
 
+      /* WebDAV Modal - Apple Style */
+      .webdav-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .webdav-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        letter-spacing: 0.2px;
+      }
+
+      .webdav-input {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: var(--text);
+        background: white;
+        border: 1px solid rgba(120, 120, 128, 0.16);
+        border-radius: 8px;
+        outline: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-sizing: border-box;
+      }
+
+      .webdav-input::placeholder {
+        color: rgba(120, 120, 128, 0.4);
+      }
+
+      .webdav-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+      }
+
+      /* iOS Style Switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 30px;
+        cursor: pointer;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(120, 120, 128, 0.24);
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .switch-slider::before {
+        content: "";
+        position: absolute;
+        height: 26px;
+        width: 26px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      }
+
+      .switch input:checked + .switch-slider {
+        background-color: #34c759;
+      }
+
+      .switch input:checked + .switch-slider::before {
+        transform: translateX(20px);
+      }
+
+      .webdav-modal button:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .webdav-modal button:active {
+        transform: translateY(0);
+        opacity: 0.8;
+      }
+
+      #webdavClose:hover {
+        background: rgba(120, 120, 128, 0.2) !important;
+      }
 
       @keyframes previewPulse {
         from {
@@ -508,31 +634,12 @@
             z-index: 50;
           "
         >
-          <div
-            style="
-              position: relative;
-              flex: 1 1 auto;
-              min-width: 0;
-              height: 40px;
-              display: flex;
-              align-items: center;
-            "
-          >
+          <div class="search-wrapper">
             <input
               type="text"
               id="searchInput"
               class="search-input"
-              placeholder="搜索提示词..."
-              style="
-                width: 100%;
-                height: 40px;
-                padding: 0 40px 0 12px;
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                box-sizing: border-box;
-                outline: none;
-                font-size: 14px;
-              "
+              placeholder="搜索"
             />
 
             <button
@@ -540,20 +647,22 @@
               style="
                 display: none;
                 position: absolute;
-                right: 10px;
+                right: 8px;
                 top: 50%;
                 transform: translateY(-50%);
-                width: 28px;
-                height: 28px;
+                width: 18px;
+                height: 18px;
                 border: none;
-                background: transparent;
-                color: var(--muted);
+                background: rgba(120, 120, 128, 0.24);
+                color: white;
                 cursor: pointer;
                 align-items: center;
                 justify-content: center;
                 border-radius: 50%;
                 padding: 0;
+                font-size: 11px;
                 z-index: 5;
+                transition: all 0.2s ease;
               "
             >
               ✕
@@ -618,7 +727,6 @@
             </div>
             <div class="preview-body" id="previewBody">从左侧选择一条提示词以查看完整内容。</div>
             <div class="preview-actions">
-              <button class="ghost-btn" id="previewCopy">Copy</button>
               <button class="accent-btn" id="previewEdit">Edit</button>
             </div>
           </section>
@@ -790,55 +898,426 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.28);
-        backdrop-filter: blur(6px);
+        background: rgba(0, 0, 0, 0.32);
+        backdrop-filter: blur(12px);
         z-index: 120;
         align-items: center;
         justify-content: center;
+        padding: 40px 20px;
       "
     >
-      <div class="modal-card" style="max-width: 520px;">
-        <h2 class="modal-title">WebDAV 同步</h2>
-        <p class="modal-subtitle">配置后可在多设备间同步提示词。</p>
+      <div class="webdav-modal" style="
+        width: 100%;
+        max-width: 480px;
+        max-height: calc(100vh - 80px);
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      ">
+        <!-- Header -->
+        <div style="
+          padding: 20px 24px 16px;
+          border-bottom: 1px solid var(--divider);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        ">
+          <div>
+            <h2 style="
+              margin: 0;
+              font-size: 17px;
+              font-weight: 600;
+              color: var(--text);
+              letter-spacing: -0.2px;
+            ">同步与备份</h2>
+            <p style="
+              margin: 4px 0 0;
+              font-size: 13px;
+              color: var(--muted);
+            ">通过 WebDAV 在多设备间同步</p>
+          </div>
+          <button id="webdavClose" style="
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(120, 120, 128, 0.12);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--muted);
+            transition: all 0.2s ease;
+          ">✕</button>
+        </div>
 
-        <div class="modal-field">
-          <label>WebDAV 地址</label>
-          <input type="text" id="webdavUrl" class="modal-input" placeholder="https://example.com/webdav/" />
-        </div>
-        <div class="modal-field">
-          <label>用户名</label>
-          <input type="text" id="webdavUsername" class="modal-input" placeholder="username" />
-        </div>
-        <div class="modal-field">
-          <label>密码</label>
-          <input type="password" id="webdavPassword" class="modal-input" placeholder="password" />
-        </div>
-        <div class="modal-field">
-          <label>远程目录</label>
-          <input type="text" id="webdavDir" class="modal-input" placeholder="prompt-master-backups" />
-        </div>
+        <!-- Content -->
+        <div style="
+          padding: 20px 24px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        ">
+          <!-- Connection Section -->
+          <div>
+            <div style="
+              font-size: 11px;
+              font-weight: 600;
+              color: var(--muted);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 12px;
+            ">连接设置</div>
+            
+            <div style="
+              background: rgba(120, 120, 128, 0.06);
+              border-radius: 12px;
+              padding: 16px;
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            ">
+              <div class="webdav-field">
+                <label class="webdav-label">服务器地址</label>
+                <input type="text" id="webdavUrl" class="webdav-input" placeholder="https://example.com/dav/" />
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="webdav-field">
+                  <label class="webdav-label">用户名</label>
+                  <input type="text" id="webdavUsername" class="webdav-input" placeholder="用户名" />
+                </div>
+                <div class="webdav-field">
+                  <label class="webdav-label">密码</label>
+                  <input type="password" id="webdavPassword" class="webdav-input" placeholder="密码" />
+                </div>
+              </div>
+              
+              <div class="webdav-field">
+                <label class="webdav-label">备份目录</label>
+                <input type="text" id="webdavDir" class="webdav-input" placeholder="prompt-master" />
+              </div>
+              
+              <button id="webdavTest" style="
+                align-self: flex-start;
+                padding: 8px 16px;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--accent);
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+              ">测试连接</button>
+            </div>
+          </div>
 
-        <div class="modal-field">
-          <label>恢复路径（可选）</label>
-          <input type="text" id="webdavRestorePath" class="modal-input" placeholder="/prompt-master-backups/prompt-master-backup-YYYYMMDD_HHMMSS.json" />
-        </div>
+          <!-- Auto Backup Section -->
+          <div>
+            <div style="
+              font-size: 11px;
+              font-weight: 600;
+              color: var(--muted);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 12px;
+            ">自动备份</div>
+            
+            <div style="
+              background: rgba(120, 120, 128, 0.06);
+              border-radius: 12px;
+              padding: 16px;
+            ">
+              <div style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+              ">
+                <div>
+                  <div style="font-size: 14px; font-weight: 500; color: var(--text);">启用自动备份</div>
+                  <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">定期将数据备份到云端</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="webdavAutoBackup" />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+              
+              <div class="webdav-field" id="intervalField" style="display: none;">
+                <label class="webdav-label">备份频率（天）</label>
+                <input type="number" id="webdavIntervalDays" class="webdav-input" min="1" max="30" value="3" />
+              </div>
+            </div>
+          </div>
 
-        <div class="modal-field">
-          <label>配置快照（可复制到另一台设备）</label>
-          <textarea id="webdavConfigJson" class="modal-textarea" rows="5" placeholder='{"version":"1.0","webdavConfig":{...}}'></textarea>
-        </div>
+          <!-- Actions Section -->
+          <div>
+            <div style="
+              font-size: 11px;
+              font-weight: 600;
+              color: var(--muted);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 12px;
+            ">手动操作</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button id="webdavBackup" style="
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+                font-weight: 500;
+                color: white;
+                background: var(--accent);
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+              ">立即备份</button>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                <button id="webdavRestore" style="
+                  padding: 12px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: var(--text);
+                  background: rgba(120, 120, 128, 0.08);
+                  border: none;
+                  border-radius: 10px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                ">从云端恢复</button>
+                
+                <button id="webdavCopyConfig" style="
+                  padding: 12px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: var(--text);
+                  background: rgba(120, 120, 128, 0.08);
+                  border: none;
+                  border-radius: 10px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                ">复制配置</button>
+                
+                <button id="webdavPasteConfig" style="
+                  padding: 12px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: var(--text);
+                  background: rgba(120, 120, 128, 0.08);
+                  border: none;
+                  border-radius: 10px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                ">粘贴配置</button>
+              </div>
+            </div>
+          </div>
 
-        <div class="modal-actions">
-          <button class="ghost-btn" id="webdavTest">测试连接</button>
-          <button class="ghost-btn" id="webdavCopyConfig">复制配置</button>
-          <button class="ghost-btn" id="webdavApplyConfig">粘贴应用</button>
-          <button class="accent-btn" id="webdavBackup">备份到 WebDAV</button>
-          <button class="ghost-btn" id="webdavRestore">从 WebDAV 恢复</button>
-          <button class="ghost-btn" id="webdavClose">关闭</button>
+          <!-- Hidden fields for compatibility -->
+          <input type="hidden" id="webdavRestorePath" />
+          <textarea id="webdavConfigJson" style="display: none;"></textarea>
+          <select id="webdavBackupList" style="display: none;"></select>
         </div>
+      </div>
+    </div>
 
-        <div class="modal-hint">
-          规则：备份文件存放在 <code>/目录/</code> 下，文件名形如 <code>prompt-master-backup-YYYYMMDD_HHMMSS.json</code>。
+    <!-- Copy Config Modal -->
+    <div id="copyConfigOverlay" style="
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(12px);
+      z-index: 130;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    ">
+      <div style="
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+      ">
+        <div style="
+          padding: 20px 24px 16px;
+          border-bottom: 1px solid var(--divider);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        ">
+          <h2 style="
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.2px;
+          ">复制配置</h2>
+          <button id="copyConfigClose" style="
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(120, 120, 128, 0.12);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--muted);
+            transition: all 0.2s ease;
+          ">✕</button>
+        </div>
+        
+        <div style="padding: 20px 24px 24px;">
+          <p style="
+            margin: 0 0 16px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+          ">将以下配置复制到其他设备，即可快速完成同步设置。</p>
+          
+          <textarea id="copyConfigText" readonly style="
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--text);
+            background: rgba(120, 120, 128, 0.06);
+            border: 1px solid rgba(120, 120, 128, 0.12);
+            border-radius: 10px;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+          "></textarea>
+          
+          <button id="copyConfigBtn" style="
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          ">复制到剪贴板</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paste Config Modal -->
+    <div id="pasteConfigOverlay" style="
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(12px);
+      z-index: 130;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    ">
+      <div style="
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+      ">
+        <div style="
+          padding: 20px 24px 16px;
+          border-bottom: 1px solid var(--divider);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        ">
+          <h2 style="
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.2px;
+          ">粘贴配置</h2>
+          <button id="pasteConfigClose" style="
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(120, 120, 128, 0.12);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--muted);
+            transition: all 0.2s ease;
+          ">✕</button>
+        </div>
+        
+        <div style="padding: 20px 24px 24px;">
+          <p style="
+            margin: 0 0 16px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+          ">粘贴从其他设备复制的配置，快速完成同步设置。</p>
+          
+          <textarea id="pasteConfigText" style="
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--text);
+            background: white;
+            border: 1px solid rgba(120, 120, 128, 0.16);
+            border-radius: 10px;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+          " placeholder='{"version":"1.0","webdavConfig":{"url":"..."}}'></textarea>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px;">
+            <button id="pasteConfigCancel" style="
+              padding: 12px;
+              font-size: 14px;
+              font-weight: 500;
+              color: var(--text);
+              background: rgba(120, 120, 128, 0.08);
+              border: none;
+              border-radius: 10px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+            ">取消</button>
+            <button id="pasteConfigApply" style="
+              padding: 12px;
+              font-size: 14px;
+              font-weight: 500;
+              color: white;
+              background: var(--accent);
+              border: none;
+              border-radius: 10px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+            ">应用配置</button>
+          </div>
         </div>
       </div>
     </div>

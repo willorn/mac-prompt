@@ -34,6 +34,9 @@ const webdavStore = new Store({
     username: "",
     password: "",
     directory: "prompt-master-backups",
+    autoBackupEnabled: true,
+    intervalDays: 3,
+    lastAutoBackupAt: 0,
   },
 });
 
@@ -174,6 +177,7 @@ app.whenReady().then(() => {
   createMainWindow();
   setupTray();
   setupGlobalShortcut();
+  scheduleAutoBackup();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -198,10 +202,25 @@ function getWebdavConfig() {
   };
 }
 
+function getWebdavSettings() {
+  const config = webdavStore.store || {};
+  return {
+    autoBackupEnabled: config.autoBackupEnabled !== false,
+    intervalDays: Number(config.intervalDays || 3),
+    lastAutoBackupAt: Number(config.lastAutoBackupAt || 0),
+  };
+}
+
 function ensureWebdavConfig() {
   const config = getWebdavConfig();
+  if (config.url && config.url.includes("jianguoyun-dav-proxy")) {
+    config.url = "https://dav.jianguoyun.com/dav/";
+  }
   if (!config.url || !config.username || !config.password) {
     throw new Error("请先配置 WebDAV");
+  }
+  if (config.url.startsWith("/")) {
+    throw new Error("WebDAV 地址需要完整 URL（如 https://dav.jianguoyun.com/dav/）");
   }
   return config;
 }
@@ -227,6 +246,52 @@ function normalizeDir(dir) {
   const safe = (dir || "prompt-master-backups").trim().replace(/\\+/g, "/");
   if (!safe) return "/prompt-master-backups";
   return safe.startsWith("/") ? safe : `/${safe}`;
+}
+
+let autoBackupTimer = null;
+
+function scheduleAutoBackup() {
+  if (autoBackupTimer) clearInterval(autoBackupTimer);
+  autoBackupTimer = setInterval(async () => {
+    try {
+      const settings = getWebdavSettings();
+      if (!settings.autoBackupEnabled) return;
+      const intervalMs = settings.intervalDays * 24 * 60 * 60 * 1000;
+      const last = settings.lastAutoBackupAt || 0;
+      if (Date.now() - last < intervalMs) return;
+      const result = await backupWebdavInternal();
+      webdavStore.set({ lastAutoBackupAt: Date.now() });
+      if (mainWindow) {
+        mainWindow.webContents.send("auto-backup", result?.fileName || "");
+      }
+    } catch (err) {
+      console.error("Auto backup failed", err);
+    }
+  }, 60 * 60 * 1000);
+}
+
+async function backupWebdavInternal() {
+  const config = ensureWebdavConfig();
+  const client = createWebdavClient();
+  const dir = normalizeDir(config.directory);
+  const fileName = buildBackupFilename();
+  const remotePath = `${dir}/${fileName}`;
+
+  try {
+    await client.createDirectory(dir);
+  } catch (error) {
+    // ignore if exists
+  }
+
+  const prompts = dataStore.get("prompts") || [];
+  const payload = {
+    version: "1.0",
+    exportedAt: new Date().toISOString(),
+    prompts,
+  };
+  const content = JSON.stringify(payload, null, 2);
+  await client.putFileContents(remotePath, content, { overwrite: true });
+  return { remotePath, fileName };
 }
 
 ipcMain.handle("minimize-window", () => {
@@ -295,6 +360,23 @@ ipcMain.handle("webdav-set-config", (_event, config) => {
   return true;
 });
 
+ipcMain.handle("webdav-get-settings", () => {
+  return getWebdavSettings();
+});
+
+ipcMain.handle("webdav-set-settings", (_event, settings) => {
+  if (!settings || typeof settings !== "object") {
+    throw new Error("invalid settings");
+  }
+  const enabled = settings.autoBackupEnabled !== false;
+  const intervalDays = Math.max(1, Math.min(Number(settings.intervalDays || 3), 30));
+  webdavStore.set({
+    autoBackupEnabled: enabled,
+    intervalDays,
+  });
+  return true;
+});
+
 ipcMain.handle("webdav-test", async () => {
   const client = createWebdavClient();
   await client.exists("/");
@@ -302,27 +384,9 @@ ipcMain.handle("webdav-test", async () => {
 });
 
 ipcMain.handle("webdav-backup", async () => {
-  const config = ensureWebdavConfig();
-  const client = createWebdavClient();
-  const dir = normalizeDir(config.directory);
-  const fileName = buildBackupFilename();
-  const remotePath = `${dir}/${fileName}`;
-
-  try {
-    await client.createDirectory(dir);
-  } catch (error) {
-    // ignore if exists
-  }
-
-  const prompts = dataStore.get("prompts") || [];
-  const payload = {
-    version: "1.0",
-    exportedAt: new Date().toISOString(),
-    prompts,
-  };
-  const content = JSON.stringify(payload, null, 2);
-  await client.putFileContents(remotePath, content, { overwrite: true });
-  return { remotePath, fileName };
+  const result = await backupWebdavInternal();
+  webdavStore.set({ lastAutoBackupAt: Date.now() });
+  return result;
 });
 
 ipcMain.handle("webdav-restore-latest", async () => {
@@ -363,4 +427,22 @@ ipcMain.handle("webdav-restore-path", async (_event, remotePath) => {
   const prompts = Array.isArray(parsed?.prompts) ? parsed.prompts : [];
   dataStore.set("prompts", prompts);
   return { remotePath, promptsCount: prompts.length };
+});
+
+ipcMain.handle("webdav-list-backups", async () => {
+  const config = ensureWebdavConfig();
+  const client = createWebdavClient();
+  const dir = normalizeDir(config.directory);
+  const exists = await client.exists(dir);
+  if (!exists) return [];
+  const contents = await client.getDirectoryContents(dir);
+  return (contents || [])
+    .filter((item) => item.type === "file" && item.basename.endsWith(".json"))
+    .map((item) => ({
+      name: item.basename,
+      path: `${dir}/${item.basename}`,
+      lastMod: item.lastmod,
+      size: item.size,
+    }))
+    .sort((a, b) => new Date(b.lastMod).getTime() - new Date(a.lastMod).getTime());
 });

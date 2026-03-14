@@ -33,3 +33,9 @@
 2. 点击 `复制配置`，将快照复制到剪贴板。
 3. 在另一台设备粘贴到「配置快照」文本框，点击 `粘贴应用`。
 4. 点击 `备份到 WebDAV` 或 `从 WebDAV 恢复`。
+
+## 坚果云快捷规则
+
+- 如果配置 JSON 中的 `url` 为 `/jianguoyun-dav-proxy/`，应用会自动转换为：
+  `https://dav.jianguoyun.com/dav/`
+- 这是为了兼容旧的 Web 端配置。
