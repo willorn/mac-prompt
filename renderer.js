@@ -84,6 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewTag = document.getElementById("previewTag");
   const previewEdit = document.getElementById("previewEdit");
   const resultCount = document.getElementById("resultCount");
+  const listHeader = document.getElementById("listHeader");
+  const editModeIndicator = document.getElementById("editModeIndicator");
 
   const tagInput = document.getElementById("newTag");
   const tagDropdown = document.getElementById("tagDropdown");
@@ -127,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPrompts = [];
   let editingIndex = null;
   let selectedIndex = null;
+  let isEditMode = false;
 
   (async () => {
     allPrompts = await loadPrompts();
@@ -417,32 +420,42 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
 
+        const actionButtons = isEditMode ? `
+          <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
+          <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
+          <button class="delete-btn" data-index="${item.originalIndex}">Del</button>
+        ` : '';
+
         card.innerHTML = `
           <div class="card-header">
             <div>
               <div class="card-title">${item.name}</div>
               <div class="card-body">${item.content}</div>
             </div>
-            <div class="card-actions">
+            <div class="card-actions" style="${isEditMode ? '' : 'display: none;'}">
               <span class="card-meta">
                 <span class="card-tag">${item.tag || "默认"}</span>
               </span>
-              <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
-              <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
-              <button class="delete-btn" data-index="${item.originalIndex}">Del</button>
+              ${actionButtons}
             </div>
           </div>
         `;
 
         card.onclick = async (e) => {
-          if (
-            ["pin-btn", "edit-btn", "delete-btn"].some((cls) =>
-              e.target.classList.contains(cls),
-            )
-          ) {
+          if (isEditMode) {
+            // 编辑模式下，点击卡片只选中，不复制
+            if (
+              ["pin-btn", "edit-btn", "delete-btn"].some((cls) =>
+                e.target.classList.contains(cls),
+              )
+            ) {
+              return;
+            }
+            selectCard(item.originalIndex);
             return;
           }
 
+          // 正常模式下，点击卡片复制内容
           const copied = await copyText(item.content);
           if (!copied) {
             console.error("复制失败");
@@ -650,6 +663,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (moreMenu) moreMenu.style.display = "none";
   };
+
+  // Edit Mode Toggle
+  function toggleEditMode() {
+    isEditMode = !isEditMode;
+    if (editModeIndicator) {
+      editModeIndicator.style.opacity = isEditMode ? "1" : "0";
+    }
+    renderCards();
+  }
+
+  if (listHeader) {
+    listHeader.onclick = (e) => {
+      // 防止点击 resultCount 时触发
+      if (e.target.id === "resultCount") return;
+      toggleEditMode();
+    };
+  }
 
   if (previewEdit) {
     previewEdit.onclick = () => {

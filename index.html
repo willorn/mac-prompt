@@ -714,9 +714,12 @@
 
         <div class="content-wrap">
           <section class="list-panel">
-            <div class="list-header">
+            <div class="list-header" id="listHeader" style="cursor: pointer; user-select: none;">
               <span>Library</span>
-              <span id="resultCount">0</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="editModeIndicator" style="font-size: 11px; color: var(--accent); opacity: 0; transition: opacity 0.2s ease;">编辑模式</span>
+                <span id="resultCount">0</span>
+              </div>
             </div>
             <div class="list-scroll" id="cardGrid"></div>
           </section>
