@@ -12,6 +12,7 @@ import Store from "electron-store";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import { createClient } from "webdav";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +26,15 @@ const store = new Store({
 });
 const dataStore = new Store({
   name: "prompt-master-data",
+});
+const webdavStore = new Store({
+  name: "prompt-master-webdav",
+  defaults: {
+    url: "",
+    username: "",
+    password: "",
+    directory: "prompt-master-backups",
+  },
 });
 
 let mainWindow = null;
@@ -178,6 +188,47 @@ app.on("will-quit", () => {
   globalShortcut.unregisterAll();
 });
 
+function getWebdavConfig() {
+  const config = webdavStore.store || {};
+  return {
+    url: config.url || "",
+    username: config.username || "",
+    password: config.password || "",
+    directory: config.directory || "prompt-master-backups",
+  };
+}
+
+function ensureWebdavConfig() {
+  const config = getWebdavConfig();
+  if (!config.url || !config.username || !config.password) {
+    throw new Error("请先配置 WebDAV");
+  }
+  return config;
+}
+
+function createWebdavClient() {
+  const config = ensureWebdavConfig();
+  return createClient(config.url, {
+    username: config.username,
+    password: config.password,
+  });
+}
+
+function buildBackupFilename() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
+    now.getDate(),
+  )}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `prompt-master-backup-${stamp}.json`;
+}
+
+function normalizeDir(dir) {
+  const safe = (dir || "prompt-master-backups").trim().replace(/\\+/g, "/");
+  if (!safe) return "/prompt-master-backups";
+  return safe.startsWith("/") ? safe : `/${safe}`;
+}
+
 ipcMain.handle("minimize-window", () => {
   if (!mainWindow) return false;
   hideMainWindow();
@@ -225,4 +276,91 @@ ipcMain.handle("set-prompts", (_event, prompts) => {
   }
   dataStore.set("prompts", prompts);
   return true;
+});
+
+ipcMain.handle("webdav-get-config", () => {
+  return getWebdavConfig();
+});
+
+ipcMain.handle("webdav-set-config", (_event, config) => {
+  if (!config || typeof config !== "object") {
+    throw new Error("invalid config");
+  }
+  webdavStore.set({
+    url: String(config.url || "").trim(),
+    username: String(config.username || "").trim(),
+    password: String(config.password || "").trim(),
+    directory: String(config.directory || "prompt-master-backups").trim(),
+  });
+  return true;
+});
+
+ipcMain.handle("webdav-test", async () => {
+  const client = createWebdavClient();
+  await client.exists("/");
+  return true;
+});
+
+ipcMain.handle("webdav-backup", async () => {
+  const config = ensureWebdavConfig();
+  const client = createWebdavClient();
+  const dir = normalizeDir(config.directory);
+  const fileName = buildBackupFilename();
+  const remotePath = `${dir}/${fileName}`;
+
+  try {
+    await client.createDirectory(dir);
+  } catch (error) {
+    // ignore if exists
+  }
+
+  const prompts = dataStore.get("prompts") || [];
+  const payload = {
+    version: "1.0",
+    exportedAt: new Date().toISOString(),
+    prompts,
+  };
+  const content = JSON.stringify(payload, null, 2);
+  await client.putFileContents(remotePath, content, { overwrite: true });
+  return { remotePath, fileName };
+});
+
+ipcMain.handle("webdav-restore-latest", async () => {
+  const config = ensureWebdavConfig();
+  const client = createWebdavClient();
+  const dir = normalizeDir(config.directory);
+
+  const exists = await client.exists(dir);
+  if (!exists) {
+    throw new Error("未找到远程备份目录");
+  }
+
+  const contents = await client.getDirectoryContents(dir);
+  const files = (contents || [])
+    .filter((item) => item.type === "file" && item.basename.endsWith(".json"))
+    .sort((a, b) => new Date(b.lastmod).getTime() - new Date(a.lastmod).getTime());
+
+  if (!files.length) {
+    throw new Error("未找到可用备份");
+  }
+
+  const latest = files[0];
+  const remotePath = `${dir}/${latest.basename}`;
+  const raw = await client.getFileContents(remotePath, { format: "text" });
+  const parsed = JSON.parse(raw);
+  const prompts = Array.isArray(parsed?.prompts) ? parsed.prompts : [];
+  dataStore.set("prompts", prompts);
+  return { remotePath, promptsCount: prompts.length };
+});
+
+ipcMain.handle("webdav-restore-path", async (_event, remotePath) => {
+  const client = createWebdavClient();
+  if (!remotePath || typeof remotePath !== "string") {
+    throw new Error("remotePath required");
+  }
+  const raw = await client.getFileContents(remotePath, { format: "text" });
+  const parsed = JSON.parse(raw);
+  const prompts = Array.isArray(parsed?.prompts) ? parsed.prompts : [];
+  dataStore.set("prompts", prompts);
+  return { remotePath, promptsCount: prompts.length };
 });

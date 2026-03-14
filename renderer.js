@@ -71,12 +71,20 @@ async function copyText(text) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const navItemsContainer = document.getElementById("sidebar");
-  const cardGrid = document.querySelector(".grid-container");
+  const cardGrid = document.getElementById("cardGrid");
   const searchInput = document.getElementById("searchInput");
   const clearSearchBtn = document.getElementById("clearSearchBtn");
   const modal = document.getElementById("modalOverlay");
   const modalTitle = modal.querySelector("h2");
   const settingsBtn = document.getElementById("settingsBtn");
+
+  const previewPanel = document.getElementById("previewPanel");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewBody = document.getElementById("previewBody");
+  const previewTag = document.getElementById("previewTag");
+  const previewCopy = document.getElementById("previewCopy");
+  const previewEdit = document.getElementById("previewEdit");
+  const resultCount = document.getElementById("resultCount");
 
   const tagInput = document.getElementById("newTag");
   const tagDropdown = document.getElementById("tagDropdown");
@@ -84,21 +92,84 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.getElementById("addBtn");
   const cancelBtn = document.getElementById("cancelBtn");
   const saveBtn = document.getElementById("saveBtn");
-  const exportBtn = document.getElementById("exportBtn");
-  const importBtn = document.getElementById("importBtn");
+  const menuImport = document.getElementById("menuImport");
+  const menuExport = document.getElementById("menuExport");
+  const menuWebdav = document.getElementById("menuWebdav");
+  const moreMenu = document.getElementById("moreMenu");
+  const webdavOverlay = document.getElementById("webdavOverlay");
+  const webdavUrl = document.getElementById("webdavUrl");
+  const webdavUsername = document.getElementById("webdavUsername");
+  const webdavPassword = document.getElementById("webdavPassword");
+  const webdavDir = document.getElementById("webdavDir");
+  const webdavConfigJson = document.getElementById("webdavConfigJson");
+  const webdavRestorePath = document.getElementById("webdavRestorePath");
+  const webdavTest = document.getElementById("webdavTest");
+  const webdavCopyConfig = document.getElementById("webdavCopyConfig");
+  const webdavApplyConfig = document.getElementById("webdavApplyConfig");
+  const webdavBackup = document.getElementById("webdavBackup");
+  const webdavRestore = document.getElementById("webdavRestore");
+  const webdavClose = document.getElementById("webdavClose");
 
   let allPrompts = [];
   let editingIndex = null;
+  let selectedIndex = null;
 
   (async () => {
     allPrompts = await loadPrompts();
     renderAll();
+    if (!allPrompts.length) {
+      clearPreview();
+    }
   })();
 
   if (settingsBtn) {
-    settingsBtn.onclick = () => {
-      alert("已支持 Alt+E 全局快捷键；托盘可显示/隐藏/退出。");
+    settingsBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (!moreMenu) return;
+      moreMenu.style.display = moreMenu.style.display === "block" ? "none" : "block";
     };
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!moreMenu) return;
+    if (e.target && moreMenu.contains(e.target)) return;
+    if (e.target === settingsBtn) return;
+    moreMenu.style.display = "none";
+  });
+
+  function buildWebdavSnapshot(config) {
+    return {
+      version: "1.0",
+      webdavConfig: config,
+    };
+  }
+
+  async function loadWebdavConfig() {
+    if (!electronAPI?.getWebdavConfig) return null;
+    const config = await electronAPI.getWebdavConfig();
+    return config || null;
+  }
+
+  async function saveWebdavConfig() {
+    if (!electronAPI?.setWebdavConfig) return;
+    const config = {
+      url: webdavUrl?.value?.trim() || "",
+      username: webdavUsername?.value?.trim() || "",
+      password: webdavPassword?.value || "",
+      directory: webdavDir?.value?.trim() || "prompt-master-backups",
+    };
+    await electronAPI.setWebdavConfig(config);
+    return config;
+  }
+
+  function openWebdavModal() {
+    if (!webdavOverlay) return;
+    webdavOverlay.style.display = "flex";
+  }
+
+  function closeWebdavModal() {
+    if (!webdavOverlay) return;
+    webdavOverlay.style.display = "none";
   }
 
   function showToast(message = "已复制到剪贴板") {
@@ -127,6 +198,48 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderAll() {
     updateSidebarAndDropdown();
     renderCards();
+  }
+
+  function applyPreviewTheme(item) {
+    if (!previewPanel) return;
+    const base = item ? `${item.name || ""}|${item.tag || ""}` : "default";
+    let hash = 0;
+    for (let i = 0; i < base.length; i += 1) {
+      hash = (hash * 31 + base.charCodeAt(i)) % 360;
+    }
+    const hue = (hash + 220) % 360;
+    previewPanel.style.setProperty("--preview-hue", hue);
+    previewPanel.classList.remove("preview-change");
+    void previewPanel.offsetWidth;
+    previewPanel.classList.add("preview-change");
+  }
+
+  function clearPreview() {
+    if (previewTitle) previewTitle.textContent = "选择一个提示词";
+    if (previewBody) previewBody.textContent = "在左侧选择一个卡片，这里会展示完整内容。";
+    if (previewTag) previewTag.textContent = "标签";
+    if (previewPanel) previewPanel.style.opacity = "0.9";
+    applyPreviewTheme(null);
+    if (resultCount) resultCount.textContent = "0";
+  }
+
+  function updatePreview(item) {
+    if (!item) return;
+    if (previewTitle) previewTitle.textContent = item.name || "未命名";
+    if (previewBody) previewBody.textContent = item.content || "";
+    if (previewTag) previewTag.textContent = item.tag || "默认";
+    if (previewPanel) previewPanel.style.opacity = "1";
+    applyPreviewTheme(item);
+  }
+
+  function selectCard(originalIndex, fromHover = false) {
+    if (selectedIndex === originalIndex && fromHover) return;
+    selectedIndex = originalIndex;
+    document.querySelectorAll(".card").forEach((el) => {
+      el.classList.toggle("active-card", Number(el.dataset.originalIndex) === originalIndex);
+    });
+    const item = allPrompts[originalIndex];
+    updatePreview(item);
   }
 
   function updateSidebarAndDropdown() {
@@ -218,6 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelector(".nav-item.active")?.dataset.filter || "all";
 
     cardGrid.innerHTML = "";
+    let visibleCount = 0;
     const displayList = [...allPrompts]
       .map((item, originalIndex) => ({ ...item, originalIndex }))
       .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
@@ -230,22 +344,27 @@ document.addEventListener("DOMContentLoaded", () => {
         activeFilter === "all" || item.tag === activeFilter;
 
       if (matchesSearch && matchesCategory) {
+        visibleCount += 1;
         const card = document.createElement("div");
         card.className = "card";
         if (item.isPinned) {
-          card.style.border = "2px solid #2a7b59";
-          card.style.boxShadow = "0 4px 12px rgba(42, 123, 89, 0.18)";
-          card.style.backgroundColor = "#f3faf6";
+          card.style.border = "2px solid #0a84ff";
+          card.style.boxShadow = "0 4px 12px rgba(10, 132, 255, 0.18)";
+          card.style.backgroundColor = "#f4f7ff";
           card.classList.add("pinned-card");
         }
 
         card.tabIndex = 0;
+        card.dataset.originalIndex = item.originalIndex;
+        card.addEventListener("mouseenter", () => selectCard(item.originalIndex, true));
+        card.addEventListener("focus", () => selectCard(item.originalIndex, true));
 
         card.onkeydown = (e) => {
           const cards = document.querySelectorAll(".card");
           const currentIndex = Array.from(cards).indexOf(card);
 
           if (e.key === "Enter") {
+            selectCard(item.originalIndex);
             card.click();
           } else if (e.key === "ArrowRight" || e.key === "Tab") {
             if (currentIndex < cards.length - 1) {
@@ -262,16 +381,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         card.innerHTML = `
           <div class="card-header">
-            <span class="card-tag">${item.tag || "默认"}</span>
+            <div>
+              <div class="card-title">${item.name}</div>
+              <div class="card-body">${item.content}</div>
+            </div>
             <div class="card-actions">
-              <button class="copy-btn" title="复制并隐藏" data-index="${item.originalIndex}">📋</button>
-              <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#2a7b59" : "#8a988f"};">📌</button>
-              <button class="edit-btn" data-index="${item.originalIndex}">✏️</button>
-              <button class="delete-btn" data-index="${item.originalIndex}">🗑️</button>
+              <span class="card-meta">
+                <span class="card-tag">${item.tag || "默认"}</span>
+              </span>
+              <button class="copy-btn" title="复制并隐藏" data-index="${item.originalIndex}">Copy</button>
+              <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
+              <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
+              <button class="delete-btn" data-index="${item.originalIndex}">Del</button>
             </div>
           </div>
-          <div class="card-title">${item.name}</div>
-          <div class="card-body">${item.content}</div>
         `;
 
         card.onclick = async (e) => {
@@ -290,20 +413,32 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          card.style.boxShadow = "0 0 0 3px rgba(42, 123, 89, 0.2)";
+          card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
           setTimeout(() => (card.style.boxShadow = ""), 500);
           showToast("已复制，窗口已隐藏");
 
-          card.style.backgroundColor = "rgba(42, 123, 89, 0.12)";
+          card.style.backgroundColor = "rgba(10, 132, 255, 0.12)";
           setTimeout(() => {
-            card.style.backgroundColor = item.isPinned ? "rgba(42, 123, 89, 0.08)" : "white";
+            card.style.backgroundColor = item.isPinned ? "rgba(10, 132, 255, 0.08)" : "white";
           }, 200);
 
           closeCurrentWindowSilently();
+          selectCard(item.originalIndex);
         };
         cardGrid.appendChild(card);
       }
     });
+
+    if (resultCount) {
+      resultCount.textContent = String(visibleCount);
+    }
+    if (selectedIndex === null || !displayList.some((i) => i.originalIndex === selectedIndex)) {
+      if (displayList.length > 0) {
+        selectCard(displayList[0].originalIndex);
+      } else {
+        clearPreview();
+      }
+    }
 
     attachDynamicEvents();
   }
@@ -343,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const card = btn.closest(".card");
         if (card) {
-          card.style.boxShadow = "0 0 0 3px rgba(42, 123, 89, 0.2)";
+          card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
           setTimeout(() => (card.style.boxShadow = ""), 500);
         }
         showToast("已复制，窗口已隐藏");
@@ -356,6 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
         editingIndex = Number(btn.dataset.index);
         const data = allPrompts[editingIndex];
+        selectCard(editingIndex);
         document.getElementById("newName").value = data.name;
         document.getElementById("newTag").value = data.tag;
         document.getElementById("newContent").value = data.content;
@@ -440,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cancelBtn.onclick = () => (modal.style.display = "none");
 
-  exportBtn.onclick = async () => {
+  if (menuExport) menuExport.onclick = async () => {
     try {
       const content = JSON.stringify(allPrompts, null, 2);
       assertElectron();
@@ -453,9 +589,15 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`导出失败: ${err}`);
       }
     }
+    if (moreMenu) moreMenu.style.display = "none";
   };
 
-  importBtn.onclick = async () => {
+  if (menuWebdav) menuWebdav.onclick = () => {
+    showToast("WebDAV 同步待配置");
+    if (moreMenu) moreMenu.style.display = "none";
+  };
+
+  if (menuImport) menuImport.onclick = async () => {
     try {
       assertElectron();
       const result = await electronAPI.importPrompts();
@@ -466,6 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       allPrompts = parsed;
+      selectedIndex = null;
       await saveData();
       showToast("导入成功");
     } catch (err) {
@@ -473,9 +616,37 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`导入失败: ${err}`);
       }
     }
+    if (moreMenu) moreMenu.style.display = "none";
   };
 
-  window.addEventListener("load", () => {
+  if (previewCopy) {
+    previewCopy.onclick = async () => {
+      if (selectedIndex === null) return;
+      const item = allPrompts[selectedIndex];
+      if (!item) return;
+      const copied = await copyText(item.content);
+      if (copied) {
+        showToast("已复制，窗口已隐藏");
+        closeCurrentWindowSilently();
+      }
+    };
+  }
+
+  if (previewEdit) {
+    previewEdit.onclick = () => {
+      if (selectedIndex === null) return;
+      const data = allPrompts[selectedIndex];
+      if (!data) return;
+      editingIndex = selectedIndex;
+      document.getElementById("newName").value = data.name;
+      document.getElementById("newTag").value = data.tag;
+      document.getElementById("newContent").value = data.content;
+      modalTitle.innerText = "编辑提示词";
+      modal.style.display = "flex";
+    };
+  }
+
+    window.addEventListener("load", () => {
     searchInput.focus();
   });
 

@@ -32,3 +32,9 @@ bun run build
 - 修改快捷键：编辑 `main.js` 中的 `globalShortcut.register("Alt+E", ...)`。
 - `master` 分支的可用压缩包：`prompt-master-electron.zip`。
 - 如果快捷键无效，多半是被其他应用占用，修改为其他组合即可。
+
+
+## WebDAV 同步
+
+- 配置入口：右上角「⋯」菜单 -> WebDAV 同步
+- 复制粘贴规则见：`docs/WEBDAV.md`

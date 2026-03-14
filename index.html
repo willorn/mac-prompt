@@ -7,25 +7,29 @@
     <style>
       :root {
         color-scheme: light;
-        --bg: #f4f6f3;
-        --bg-accent: #e9efe6;
+        --bg: #f5f5f7;
+        --bg-warm: #f7f3ee;
         --panel: #ffffff;
-        --panel-2: #f7f9f6;
-        --text: #1f2a24;
-        --muted: #6b776f;
-        --accent: #2a7b59;
-        --accent-2: #1c5b42;
-        --border: #e1e7e1;
-        --shadow: 0 6px 16px rgba(16, 24, 16, 0.08);
+        --text: #1d1d1f;
+        --muted: #6e6e73;
+        --accent: #0a84ff;
+        --border: rgba(60, 60, 67, 0.12);
+        --divider: rgba(60, 60, 67, 0.08);
+        --shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
         padding: 0;
-        font-family: "Avenir Next", "PingFang SC", "Noto Sans CJK SC", "Segoe UI", sans-serif;
-        background: radial-gradient(1200px 600px at 0% 0%, var(--bg-accent), var(--bg));
+        font-family: "SF Pro Text", "SF Pro Display", "PingFang SC", "Noto Sans CJK SC", "Helvetica Neue", sans-serif;
+        background: radial-gradient(1200px 500px at 0% 0%, var(--bg-warm), var(--bg));
         color: var(--text);
         overflow: hidden;
+        letter-spacing: 0.1px;
       }
 
       .app-container {
@@ -35,28 +39,30 @@
       }
 
       aside {
-        width: 170px;
-        background: var(--panel);
+        width: 180px;
+        background: rgba(255, 255, 255, 0.86);
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
         padding: 18px 12px;
         gap: 6px;
+        backdrop-filter: blur(18px);
       }
 
       .logo {
-        font-size: 15px;
+        font-size: 12px;
         font-weight: 700;
-        color: var(--accent-2);
-        margin-bottom: 12px;
+        color: var(--text);
+        margin: 2px 0 14px;
         text-align: center;
-        letter-spacing: 0.2px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
       }
 
       .nav-item {
         padding: 7px 8px;
         margin-bottom: 2px;
-        border-radius: 8px;
+        border-radius: 10px;
         color: var(--muted);
         text-decoration: none;
         font-size: 12px;
@@ -65,15 +71,15 @@
       }
 
       .nav-item:hover {
-        background-color: var(--panel-2);
+        background-color: rgba(10, 132, 255, 0.08);
         color: var(--text);
       }
 
       .nav-item.active {
-        background-color: #e7f2ed !important;
-        color: var(--accent-2) !important;
+        background-color: rgba(10, 132, 255, 0.12) !important;
+        color: var(--accent) !important;
         font-weight: 600;
-        border-left: 3px solid var(--accent);
+        border-left: 2px solid var(--accent);
       }
 
       main {
@@ -83,75 +89,107 @@
         min-width: 0;
       }
 
+      header {
+        backdrop-filter: blur(18px);
+      }
+
       .search-input {
         width: 100%;
-        max-width: 520px;
-        padding: 8px 14px;
-        background-color: #f1f5f1;
+        max-width: 560px;
+        padding: 8px 12px;
+        background-color: #f2f2f4;
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: 12px;
         outline: none;
         font-size: 13px;
         transition: border 0.2s ease, box-shadow 0.2s ease;
       }
 
       .search-input:focus {
-        border-color: #b9d6c7;
-        box-shadow: 0 0 0 3px rgba(42, 123, 89, 0.12);
+        border-color: #cdd9f7;
+        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.14);
       }
 
       #clearSearchBtn:hover {
-        color: #54645b !important;
+        color: #505055 !important;
         transform: scale(1.05);
       }
 
-      .grid-container {
-        padding: 20px 22px 26px;
+      .content-wrap {
+        padding: 18px 20px 22px;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 12px;
+        grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1.1fr);
+        gap: 16px;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .list-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 11.5px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .list-scroll {
         overflow-y: auto;
+        background: rgba(255, 255, 255, 0.82);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-soft);
+        padding: 6px;
+        display: grid;
+        gap: 6px;
+        backdrop-filter: blur(16px);
       }
 
       .card {
-        background: var(--panel);
-        padding: 12px 14px;
+        padding: 10px 12px;
         border-radius: 12px;
-        border: 1px solid var(--border);
-        box-shadow: none;
-        transition: transform 0.15s ease, border 0.2s ease, box-shadow 0.2s ease;
         cursor: pointer;
         user-select: none;
         position: relative;
-        min-height: 110px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        background: transparent;
       }
 
       .card:hover {
-        border-color: #c9ded2;
+        background: #ffffff;
         transform: translateY(-2px);
-        box-shadow: var(--shadow);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
       }
 
-      .card:active {
-        transform: translateY(0);
+      .card:focus {
+        outline: none;
+        background: #eef3ff;
       }
 
-      .card-tag {
-        display: inline-flex;
+      .card.active-card {
+        background: #eef3ff;
+        box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.24);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        padding: 2px 8px;
-        background: #e8f4ef;
-        color: #2a7b59;
-        border-radius: 999px;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.2px;
+        gap: 10px;
       }
 
       .card-title {
-        font-weight: 700;
-        font-size: 14px;
-        margin: 8px 0 6px;
+        font-weight: 600;
+        font-size: 13px;
+        margin: 0;
       }
 
       .card-body {
@@ -159,28 +197,33 @@
         font-size: 12px;
         line-height: 1.5;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        margin-top: 4px;
       }
 
-      .card:focus {
-        outline: none;
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 3px rgba(42, 123, 89, 0.2) !important;
-        transform: translateY(-2px);
+      .card-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        color: var(--muted);
       }
 
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 8px;
+      .card-tag {
+        padding: 2px 8px;
+        background: rgba(10, 132, 255, 0.12);
+        color: var(--accent);
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
       }
 
       .card-actions {
         display: flex;
-        gap: 6px;
+        gap: 8px;
         opacity: 0;
         transition: opacity 0.15s ease;
       }
@@ -194,12 +237,117 @@
         border: none;
         background: transparent;
         cursor: pointer;
-        color: #8a988f;
-        font-size: 13px;
+        color: #9a9aa0;
+        font-size: 12px;
+        letter-spacing: 0.2px;
       }
 
       .card-actions button:hover {
-        color: #2a7b59;
+        color: var(--accent);
+      }
+
+      .preview-panel {
+        --preview-hue: 220;
+        background: radial-gradient(600px 220px at 0% 0%, hsla(var(--preview-hue), 80%, 94%, 0.9), rgba(255, 255, 255, 0.92));
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 20px 22px;
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 0;
+        backdrop-filter: blur(20px);
+        transition: background 0.25s ease;
+      }
+
+      .preview-panel.preview-change {
+        animation: previewPulse 0.25s ease;
+      }
+
+      .preview-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .preview-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .preview-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 10px;
+        background: rgba(10, 132, 255, 0.12);
+        color: var(--accent);
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        width: fit-content;
+      }
+
+      .preview-body {
+        color: var(--text);
+        font-size: 13.5px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+      }
+
+      .preview-actions {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+      }
+
+      .ghost-btn {
+        border: 1px solid var(--border);
+        background: #ffffff;
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .ghost-btn:hover {
+        border-color: #cdd9f7;
+        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.08);
+      }
+
+      .accent-btn {
+        border: none;
+        background: var(--accent);
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .accent-btn:hover {
+        background: #0070e0;
+      }
+
+      .menu-item {
+        width: 100%;
+        text-align: left;
+        border: none;
+        background: transparent;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 12.5px;
+        color: var(--text);
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .menu-item:hover {
+        background: rgba(10, 132, 255, 0.08);
       }
 
       #toast {
@@ -215,6 +363,86 @@
         to {
           opacity: 1;
           transform: translate(-50%, 0);
+        }
+      }
+
+      .modal-card {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 20px 22px;
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .modal-subtitle {
+        margin: 0 0 6px 0;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .modal-field label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .modal-input,
+      .modal-textarea {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 9px 10px;
+        font-size: 12.5px;
+        background: #ffffff;
+        outline: none;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .modal-input:focus,
+      .modal-textarea:focus {
+        border-color: #cdd9f7;
+        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+      }
+
+      .modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .modal-hint {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .modal-hint code {
+        background: rgba(10, 132, 255, 0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+
+
+      @keyframes previewPulse {
+        from {
+          transform: scale(0.996);
+        }
+        to {
+          transform: scale(1);
         }
       }
     </style>
@@ -253,7 +481,7 @@
               flex: 1;
               padding: 8px;
               font-size: 12px;
-              border: 1px solid #e2e8f0;
+              border: 1px solid var(--border);
               border-radius: 6px;
               background: white;
               cursor: pointer;
@@ -267,7 +495,7 @@
               flex: 1;
               padding: 8px;
               font-size: 12px;
-              border: 1px solid #e2e8f0;
+              border: 1px solid var(--border);
               border-radius: 6px;
               background: white;
               cursor: pointer;
@@ -282,14 +510,14 @@
           style="
             margin-top: auto;
             padding: 12px;
-            background: #2563eb;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
           "
         >
-          + 新增提示词
+          新增
         </button>
       </aside>
 
@@ -300,9 +528,9 @@
             align-items: center;
             gap: 12px;
             padding: 0 24px;
-            height: 56px;
-            min-height: 56px;
-            max-height: 56px;
+            height: 50px;
+            min-height: 50px;
+            max-height: 50px;
             box-sizing: border-box;
             overflow: hidden;
             background: white;
@@ -327,8 +555,8 @@
                 width: 100%;
                 height: 40px;
                 padding: 0 40px 0 12px;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
+                border: 1px solid var(--border);
+                border-radius: 12px;
                 box-sizing: border-box;
                 outline: none;
                 font-size: 14px;
@@ -340,14 +568,14 @@
               style="
                 display: none;
                 position: absolute;
-                right: 12px;
+                right: 10px;
                 top: 50%;
                 transform: translateY(-50%);
                 width: 28px;
                 height: 28px;
                 border: none;
                 background: transparent;
-                color: #94a3b8;
+                color: var(--muted);
                 cursor: pointer;
                 align-items: center;
                 justify-content: center;
@@ -370,18 +598,56 @@
               align-items: center;
               justify-content: center;
               background: white;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               cursor: pointer;
               transition: all 0.2s;
-              font-size: 18px;
+              font-size: 16px;
             "
           >
-            ⚙️
+            ⋯
           </button>
+          <div id="moreMenu" style="
+            position: absolute;
+            right: 20px;
+            top: 54px;
+            width: 180px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            padding: 6px;
+            display: none;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+          ">
+            <button class="menu-item" id="menuImport">导入</button>
+            <button class="menu-item" id="menuExport">导出</button>
+            <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
+            <button class="menu-item" id="menuWebdav">WebDAV 同步</button>
+          </div>
         </header>
 
-        <div class="grid-container" id="cardGrid"></div>
+        <div class="content-wrap">
+          <section class="list-panel">
+            <div class="list-header">
+              <span>Library</span>
+              <span id="resultCount">0</span>
+            </div>
+            <div class="list-scroll" id="cardGrid"></div>
+          </section>
+          <section class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+              <span class="preview-tag" id="previewTag">标签</span>
+              <div class="preview-title" id="previewTitle">未选择</div>
+            </div>
+            <div class="preview-body" id="previewBody">从左侧选择一条提示词以查看完整内容。</div>
+            <div class="preview-actions">
+              <button class="ghost-btn" id="previewCopy">Copy</button>
+              <button class="accent-btn" id="previewEdit">Edit</button>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
 
@@ -407,7 +673,7 @@
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         "
       >
-        <h2 style="margin-top: 0; margin-bottom: 20px; color: #1e293b">
+        <h2 style="margin-top: 0; margin-bottom: 20px; color: var(--text)">
           新增提示词
         </h2>
 
@@ -418,7 +684,7 @@
               font-size: 14px;
               font-weight: 500;
               margin-bottom: 4px;
-              color: #475569;
+              color: var(--muted);
             "
             >名称</label
           >
@@ -428,8 +694,8 @@
             style="
               width: 100%;
               padding: 10px;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               box-sizing: border-box;
               outline: none;
             "
@@ -443,7 +709,7 @@
               font-size: 14px;
               font-weight: 500;
               margin-bottom: 4px;
-              color: #475569;
+              color: var(--muted);
             "
             >标签</label
           >
@@ -455,8 +721,8 @@
             style="
               width: 100%;
               padding: 10px;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               box-sizing: border-box;
               outline: none;
               transition: border-color 0.2s;
@@ -472,8 +738,8 @@
               left: 0;
               right: 0;
               background: white;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               margin-top: 4px;
               box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
               z-index: 110;
@@ -490,7 +756,7 @@
               font-size: 14px;
               font-weight: 500;
               margin-bottom: 4px;
-              color: #475569;
+              color: var(--muted);
             "
             >内容</label
           >
@@ -500,8 +766,8 @@
             style="
               width: 100%;
               padding: 10px;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               box-sizing: border-box;
               resize: none;
               outline: none;
@@ -515,8 +781,8 @@
             id="cancelBtn"
             style="
               padding: 10px 20px;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
               background: white;
               color: #64748b;
               cursor: pointer;
@@ -530,8 +796,8 @@
             style="
               padding: 10px 24px;
               border: none;
-              border-radius: 8px;
-              background: #2563eb;
+              border-radius: 12px;
+              background: var(--accent);
               color: white;
               cursor: pointer;
               font-weight: 500;
@@ -539,6 +805,65 @@
           >
             保存
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="webdavOverlay"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(6px);
+        z-index: 120;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div class="modal-card" style="max-width: 520px;">
+        <h2 class="modal-title">WebDAV 同步</h2>
+        <p class="modal-subtitle">配置后可在多设备间同步提示词。</p>
+
+        <div class="modal-field">
+          <label>WebDAV 地址</label>
+          <input type="text" id="webdavUrl" class="modal-input" placeholder="https://example.com/webdav/" />
+        </div>
+        <div class="modal-field">
+          <label>用户名</label>
+          <input type="text" id="webdavUsername" class="modal-input" placeholder="username" />
+        </div>
+        <div class="modal-field">
+          <label>密码</label>
+          <input type="password" id="webdavPassword" class="modal-input" placeholder="password" />
+        </div>
+        <div class="modal-field">
+          <label>远程目录</label>
+          <input type="text" id="webdavDir" class="modal-input" placeholder="prompt-master-backups" />
+        </div>
+
+        <div class="modal-field">
+          <label>恢复路径（可选）</label>
+          <input type="text" id="webdavRestorePath" class="modal-input" placeholder="/prompt-master-backups/prompt-master-backup-YYYYMMDD_HHMMSS.json" />
+        </div>
+
+        <div class="modal-field">
+          <label>配置快照（可复制到另一台设备）</label>
+          <textarea id="webdavConfigJson" class="modal-textarea" rows="5" placeholder='{"version":"1.0","webdavConfig":{...}}'></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn" id="webdavTest">测试连接</button>
+          <button class="ghost-btn" id="webdavCopyConfig">复制配置</button>
+          <button class="ghost-btn" id="webdavApplyConfig">粘贴应用</button>
+          <button class="accent-btn" id="webdavBackup">备份到 WebDAV</button>
+          <button class="ghost-btn" id="webdavRestore">从 WebDAV 恢复</button>
+          <button class="ghost-btn" id="webdavClose">关闭</button>
+        </div>
+
+        <div class="modal-hint">
+          规则：备份文件存放在 <code>/目录/</code> 下，文件名形如 <code>prompt-master-backup-YYYYMMDD_HHMMSS.json</code>。
         </div>
       </div>
     </div>
