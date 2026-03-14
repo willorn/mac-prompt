@@ -1,4 +1,13 @@
-import { app, BrowserWindow, dialog, globalShortcut, ipcMain, Menu, Tray } from "electron";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  globalShortcut,
+  ipcMain,
+  Menu,
+  screen,
+  Tray,
+} from "electron";
 import Store from "electron-store";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -20,6 +29,7 @@ const dataStore = new Store({
 
 let mainWindow = null;
 let tray = null;
+let isHiddenOffscreen = false;
 
 function createMainWindow() {
   const saved = store.get("bounds");
@@ -34,7 +44,7 @@ function createMainWindow() {
     minHeight: 650,
     show: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -48,7 +58,7 @@ function createMainWindow() {
 
   mainWindow.on("close", (event) => {
     event.preventDefault();
-    mainWindow.hide();
+    hideMainWindow();
   });
 
   mainWindow.on("resize", saveWindowState);
@@ -58,7 +68,7 @@ function createMainWindow() {
 }
 
 function saveWindowState() {
-  if (!mainWindow) return;
+  if (!mainWindow || isHiddenOffscreen) return;
   const bounds = mainWindow.getBounds();
   store.set("bounds", bounds);
   store.set("isMaximized", mainWindow.isMaximized());
@@ -66,22 +76,59 @@ function saveWindowState() {
 
 function showMainWindow() {
   if (!mainWindow) return;
+  const saved = store.get("bounds");
+  const isMaximized = store.get("isMaximized");
+
+  if (saved && !isMaximized) {
+    mainWindow.setBounds(saved);
+  }
+
+  mainWindow.setOpacity(1);
+  mainWindow.setSkipTaskbar(false);
   mainWindow.show();
+  if (mainWindow.isMinimized()) {
+    mainWindow.restore();
+  }
+  if (isMaximized) {
+    mainWindow.maximize();
+  }
+  isHiddenOffscreen = false;
   mainWindow.focus();
   mainWindow.webContents.send("focus-search");
 }
 
 function hideMainWindow() {
   if (!mainWindow) return;
-  mainWindow.hide();
+  saveWindowState();
+
+  const bounds = mainWindow.getBounds();
+  const displays = screen.getAllDisplays();
+  const rightMost = Math.max(
+    ...displays.map((d) => d.bounds.x + d.bounds.width),
+  );
+  const offscreenX = rightMost + bounds.width + 1000;
+  const offscreenY = bounds.y;
+
+  isHiddenOffscreen = true;
+  mainWindow.setOpacity(0);
+  mainWindow.setSkipTaskbar(true);
+  mainWindow.setBounds(
+    {
+      x: offscreenX,
+      y: offscreenY,
+      width: bounds.width,
+      height: bounds.height,
+    },
+    false,
+  );
 }
 
 function toggleMainWindow() {
   if (!mainWindow) return;
-  if (mainWindow.isVisible()) {
-    hideMainWindow();
-  } else {
+  if (!mainWindow.isVisible() || isHiddenOffscreen) {
     showMainWindow();
+  } else {
+    hideMainWindow();
   }
 }
 
@@ -102,9 +149,15 @@ function setupTray() {
 }
 
 function setupGlobalShortcut() {
-  globalShortcut.register("Alt+E", () => {
+  const ok = globalShortcut.register("Alt+E", () => {
     toggleMainWindow();
   });
+  if (!ok) {
+    dialog.showErrorBox(
+      "快捷键注册失败",
+      "Alt+E 已被其他应用占用，请修改 main.js 中的快捷键组合。",
+    );
+  }
 }
 
 app.whenReady().then(() => {
@@ -127,7 +180,7 @@ app.on("will-quit", () => {
 
 ipcMain.handle("minimize-window", () => {
   if (!mainWindow) return false;
-  mainWindow.minimize();
+  hideMainWindow();
   return true;
 });
 

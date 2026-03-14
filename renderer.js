@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       assertElectron();
       await electronAPI.minimizeWindow();
     } catch {
-      window.close();
+      showToast("隐藏失败，请检查快捷键/权限设置");
     }
   }
 
