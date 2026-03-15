@@ -123,6 +123,15 @@ function hideMainWindow() {
   const offscreenY = bounds.y;
 
   isHiddenOffscreen = true;
+  
+  // 先隐藏窗口，让焦点回到之前的应用
+  mainWindow.blur();
+  
+  // macOS 上使用 app.hide() 可以更好地恢复焦点
+  if (process.platform === 'darwin') {
+    app.hide();
+  }
+  
   mainWindow.setOpacity(0);
   mainWindow.setSkipTaskbar(true);
   mainWindow.setBounds(

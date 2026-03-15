@@ -1345,5 +1345,84 @@
     >
       已复制到剪贴板
     </div>
+
+    <!-- Context Menu -->
+    <div
+      id="contextMenu"
+      style="
+        display: none;
+        position: fixed;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        padding: 6px 0;
+        min-width: 140px;
+        z-index: 1000;
+        backdrop-filter: blur(20px);
+        font-size: 13px;
+      "
+    >
+      <div
+        class="context-menu-item"
+        data-action="pin"
+        style="
+          padding: 8px 16px;
+          cursor: pointer;
+          color: var(--text);
+          transition: background 0.15s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+        onmouseover="this.style.background='rgba(0,0,0,0.04)'"
+        onmouseout="this.style.background='transparent'"
+      >
+        <span style="font-size: 12px;">📌</span>
+        <span id="contextPinText">置顶</span>
+      </div>
+      <div
+        class="context-menu-item"
+        data-action="edit"
+        style="
+          padding: 8px 16px;
+          cursor: pointer;
+          color: var(--text);
+          transition: background 0.15s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+        onmouseover="this.style.background='rgba(0,0,0,0.04)'"
+        onmouseout="this.style.background='transparent'"
+      >
+        <span style="font-size: 12px;">✏️</span>
+        <span>编辑</span>
+      </div>
+      <div
+        style="
+          height: 1px;
+          background: var(--divider);
+          margin: 4px 8px;
+        "
+      ></div>
+      <div
+        class="context-menu-item"
+        data-action="delete"
+        style="
+          padding: 8px 16px;
+          cursor: pointer;
+          color: #ff3b30;
+          transition: background 0.15s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        "
+        onmouseover="this.style.background='rgba(255,59,48,0.08)'"
+        onmouseout="this.style.background='transparent'"
+      >
+        <span style="font-size: 12px;">🗑️</span>
+        <span>删除</span>
+      </div>
+    </div>
   </body>
 </html>
