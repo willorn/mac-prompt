@@ -26,12 +26,19 @@
     "files": [
       "**/*"
     ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
     "directories": {
       "buildResources": "assets",
       "output": "dist"
     },
     "mac": {
       "target": "dmg"
-    }
+    },
+    "asar": true
   }
 }

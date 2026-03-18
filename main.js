@@ -17,6 +17,15 @@ import { createClient } from "webdav";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// 兼容打包后的路径
+function getAssetPath(...paths) {
+  // 打包后使用 app.getAppPath() 获取应用根目录
+  if (app.isPackaged) {
+    return path.join(app.getAppPath(), ...paths);
+  }
+  return path.join(__dirname, ...paths);
+}
+
 const store = new Store({
   name: "window-state",
   defaults: {
@@ -43,6 +52,7 @@ const webdavStore = new Store({
 let mainWindow = null;
 let tray = null;
 let isHiddenOffscreen = false;
+let isQuitting = false;
 
 function createMainWindow() {
   const saved = store.get("bounds");
@@ -57,19 +67,20 @@ function createMainWindow() {
     minHeight: 650,
     show: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"),
+      preload: getAssetPath("preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.loadFile(getAssetPath("index.html"));
 
   if (isMaximized) {
     mainWindow.maximize();
   }
 
   mainWindow.on("close", (event) => {
+    if (isQuitting) return;
     event.preventDefault();
     hideMainWindow();
   });
@@ -155,7 +166,8 @@ function toggleMainWindow() {
 }
 
 function setupTray() {
-  const iconPath = path.join(__dirname, "assets", "trayTemplate.png");
+  const iconPath = getAssetPath("assets", "trayTemplate.png");
+  console.log("托盘图标路径:", iconPath);
   tray = new Tray(iconPath);
 
   const menu = Menu.buildFromTemplate([
@@ -172,13 +184,19 @@ function setupTray() {
 
 function setupGlobalShortcut() {
   const ok = globalShortcut.register("Alt+E", () => {
+    console.log("Alt+E 快捷键触发");
     toggleMainWindow();
   });
+
+  console.log("快捷键注册结果:", ok);
+  console.log("是否为打包版本:", app.isPackaged);
+  console.log("macOS 平台:", process.platform === 'darwin');
+
   if (!ok) {
-    dialog.showErrorBox(
-      "快捷键注册失败",
-      "Alt+E 已被其他应用占用，请修改 main.js 中的快捷键组合。",
-    );
+    const msg = process.platform === 'darwin'
+      ? "快捷键注册失败！\n\nmacOS 系统需要授予辅助功能权限才能使用全局快捷键。\n\n请打开: 系统设置 -> 隐私与安全性 -> 辅助功能 -> 添加 \"Prompt Master\""
+      : "Alt+E 已被其他应用占用，请修改 main.js 中的快捷键组合。";
+    dialog.showErrorBox("快捷键注册失败", msg);
   }
 }
 
@@ -199,6 +217,10 @@ app.whenReady().then(() => {
 
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
+});
+
+app.on("before-quit", () => {
+  isQuitting = true;
 });
 
 function getWebdavConfig() {
