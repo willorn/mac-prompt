@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "prompt-master-electron",
+      "name": "prompt-box-electron",
       "dependencies": {
         "electron-store": "^9.0.0",
         "webdav": "^5.9.0",

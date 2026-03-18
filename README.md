@@ -1,4 +1,4 @@
-# Prompt Master - 你的提示词管家
+# PromptBox - 你的提示词管家
 
 [![Electron](https://img.shields.io/badge/Electron-32.2.0-47848F?logo=electron)](https://electronjs.org/)
 [![Bun](https://img.shields.io/badge/Bun-1.3.4-000000?logo=bun)](https://bun.sh/)
@@ -10,7 +10,7 @@
 
 ![screenshot](assets/screenshot.png)
 
-## ✨ 为什么选择 Prompt Master？
+## ✨ 为什么选择 PromptBox？
 
 | 痛点 | 解决方案 |
 |------|----------|
@@ -23,7 +23,7 @@
 
 ### 下载安装
 
-前往 [Releases](https://github.com/willorn/prompt-master-electron/releases) 页面下载最新版本：
+前往 [Releases](https://github.com/willorn/prompt-box-electron/releases) 页面下载最新版本：
 
 - **macOS**: `Prompt-Master-x.x.x.dmg`
 - **Windows**: `Prompt-Master-x.x.x.exe` (计划中)
@@ -33,8 +33,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/willorn/prompt-master-electron.git
-cd prompt-master-electron
+git clone https://github.com/willorn/prompt-box-electron.git
+cd prompt-box-electron
 
 # 安装依赖
 bun install
@@ -120,7 +120,7 @@ bun run build
 ## 📁 项目结构
 
 ```
-prompt-master-electron/
+prompt-box-electron/
 ├── assets/                 # 静态资源
 │   └── trayTemplate.png   # 托盘图标
 ├── docs/                   # 文档
@@ -143,7 +143,7 @@ prompt-master-electron/
 
 ## 📄 许可证
 
-[MIT](LICENSE) © Prompt Master
+[MIT](LICENSE) © PromptBox
 
 ## 🙏 致谢
 

@@ -11,7 +11,7 @@
     "url": "https://example.com/webdav/",
     "username": "your-username",
     "password": "your-password",
-    "directory": "prompt-master-backups"
+    "directory": "prompt-box-backups"
   }
 }
 ```
@@ -20,12 +20,12 @@
 
 - `url`：WebDAV 服务根地址。
 - `username` / `password`：基础认证。
-- `directory`：远程目录名（默认 `prompt-master-backups`）。
+- `directory`：远程目录名（默认 `prompt-box-backups`）。
 
 ## 备份规则
 
 - 备份文件会写入：`/<directory>/` 目录
-- 文件名格式：`prompt-master-backup-YYYYMMDD_HHMMSS.json`
+- 文件名格式：`prompt-box-backup-YYYYMMDD_HHMMSS.json`
 
 ## 使用方式
 

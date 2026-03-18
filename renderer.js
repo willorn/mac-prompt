@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       url: webdavUrl?.value?.trim() || "",
       username: webdavUsername?.value?.trim() || "",
       password: webdavPassword?.value || "",
-      directory: webdavDir?.value?.trim() || "prompt-master-backups",
+      directory: webdavDir?.value?.trim() || "prompt-box-backups",
     };
     await electronAPI.setWebdavConfig(config);
     return config;
@@ -694,7 +694,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (webdavUrl) webdavUrl.value = config.url || "";
         if (webdavUsername) webdavUsername.value = config.username || "";
         if (webdavPassword) webdavPassword.value = config.password || "";
-        if (webdavDir) webdavDir.value = config.directory || "prompt-master-backups";
+        if (webdavDir) webdavDir.value = config.directory || "prompt-box-backups";
         if (webdavConfigJson) {
           webdavConfigJson.value = JSON.stringify(buildWebdavSnapshot(config), null, 2);
         }
@@ -887,7 +887,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (webdavUrl) webdavUrl.value = url;
       if (webdavUsername) webdavUsername.value = cfg.username || "";
       if (webdavPassword) webdavPassword.value = cfg.password || "";
-      if (webdavDir) webdavDir.value = cfg.directory || "prompt-master";
+      if (webdavDir) webdavDir.value = cfg.directory || "prompt-box-backups";
       await saveWebdavConfig();
       closePasteConfigModal();
       showToast("配置已应用");

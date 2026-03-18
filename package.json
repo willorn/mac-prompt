@@ -1,5 +1,5 @@
 {
-  "name": "prompt-master-electron",
+  "name": "prompt-box-electron",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -22,7 +22,7 @@
   },
   "build": {
     "appId": "com.promptmaster.desktop",
-    "productName": "Prompt Master",
+    "productName": "PromptBox",
     "files": [
       "**/*"
     ],

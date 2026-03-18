@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你对 Prompt Master 的兴趣！我们欢迎各种形式的贡献，包括但不限于：
+感谢你对 PromptBox 的兴趣！我们欢迎各种形式的贡献，包括但不限于：
 
 - 提交 Bug 报告
 - 提出新功能建议
@@ -10,7 +10,7 @@
 
 ## 🐛 提交 Bug
 
-如果你发现了 Bug，请通过 [GitHub Issues](https://github.com/willorn/prompt-master-electron/issues) 提交，并包含以下信息：
+如果你发现了 Bug，请通过 [GitHub Issues](https://github.com/willorn/prompt-box-electron/issues) 提交，并包含以下信息：
 
 1. **问题描述** - 清晰描述发生了什么
 2. **复现步骤** - 详细步骤说明如何复现
@@ -41,8 +41,8 @@
 
 ```bash
 # 1. Fork 并克隆项目
-git clone https://github.com/willorn/prompt-master-electron.git
-cd prompt-master-electron
+git clone https://github.com/willorn/prompt-box-electron.git
+cd prompt-box-electron
 
 # 2. 安装依赖
 bun install
@@ -54,7 +54,7 @@ bun run dev
 ### 项目结构
 
 ```
-prompt-master-electron/
+prompt-box-electron/
 ├── main.js           # Electron 主进程
 ├── preload.cjs       # 预加载脚本（安全桥梁）
 ├── renderer.js       # 渲染进程逻辑
@@ -129,7 +129,7 @@ docs: 更新 WebDAV 配置说明
 
 ## 🎯 开发计划
 
-查看 [Projects](https://github.com/willorn/prompt-master-electron/projects) 了解当前开发计划和优先级。
+查看 [Projects](https://github.com/willorn/prompt-box-electron/projects) 了解当前开发计划和优先级。
 
 ## ❓ 需要帮助？
 

@@ -1,4 +1,4 @@
-# Prompt Master v{VERSION}
+# PromptBox v{VERSION}
 
 ## 🎉 新版本发布
 
@@ -57,7 +57,7 @@
 
 ## 反馈问题
 
-如果遇到问题，请在 [Issues](https://github.com/willorn/prompt-master-electron/issues) 页面提交。
+如果遇到问题，请在 [Issues](https://github.com/willorn/prompt-box-electron/issues) 页面提交。
 
 ## 更新日志
 

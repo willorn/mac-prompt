@@ -34,15 +34,15 @@ const store = new Store({
   },
 });
 const dataStore = new Store({
-  name: "prompt-master-data",
+  name: "prompt-box-data",
 });
 const webdavStore = new Store({
-  name: "prompt-master-webdav",
+  name: "prompt-box-webdav",
   defaults: {
     url: "",
     username: "",
     password: "",
-    directory: "prompt-master-backups",
+    directory: "prompt-box-backups",
     autoBackupEnabled: true,
     intervalDays: 3,
     lastAutoBackupAt: 0,
@@ -177,7 +177,7 @@ function setupTray() {
     { label: "退出", click: () => app.exit(0) },
   ]);
 
-  tray.setToolTip("Prompt Master");
+  tray.setToolTip("PromptBox");
   tray.setContextMenu(menu);
   tray.on("click", toggleMainWindow);
 }
@@ -194,7 +194,7 @@ function setupGlobalShortcut() {
 
   if (!ok) {
     const msg = process.platform === 'darwin'
-      ? "快捷键注册失败！\n\nmacOS 系统需要授予辅助功能权限才能使用全局快捷键。\n\n请打开: 系统设置 -> 隐私与安全性 -> 辅助功能 -> 添加 \"Prompt Master\""
+      ? "快捷键注册失败！\n\nmacOS 系统需要授予辅助功能权限才能使用全局快捷键。\n\n请打开: 系统设置 -> 隐私与安全性 -> 辅助功能 -> 添加 \"PromptBox\""
       : "Alt+E 已被其他应用占用，请修改 main.js 中的快捷键组合。";
     dialog.showErrorBox("快捷键注册失败", msg);
   }
@@ -229,7 +229,7 @@ function getWebdavConfig() {
     url: config.url || "",
     username: config.username || "",
     password: config.password || "",
-    directory: config.directory || "prompt-master-backups",
+    directory: config.directory || "prompt-box-backups",
   };
 }
 
@@ -270,12 +270,12 @@ function buildBackupFilename() {
   const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
     now.getDate(),
   )}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  return `prompt-master-backup-${stamp}.json`;
+  return `prompt-box-backup-${stamp}.json`;
 }
 
 function normalizeDir(dir) {
-  const safe = (dir || "prompt-master-backups").trim().replace(/\\+/g, "/");
-  if (!safe) return "/prompt-master-backups";
+  const safe = (dir || "prompt-box-backups").trim().replace(/\\+/g, "/");
+  if (!safe) return "/prompt-box-backups";
   return safe.startsWith("/") ? safe : `/${safe}`;
 }
 
@@ -386,7 +386,7 @@ ipcMain.handle("webdav-set-config", (_event, config) => {
     url: String(config.url || "").trim(),
     username: String(config.username || "").trim(),
     password: String(config.password || "").trim(),
-    directory: String(config.directory || "prompt-master-backups").trim(),
+    directory: String(config.directory || "prompt-box-backups").trim(),
   });
   return true;
 });
