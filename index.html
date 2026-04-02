@@ -82,6 +82,18 @@
         border-left: 2px solid var(--accent);
       }
 
+      .nav-hidden-flag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 4px;
+        margin-left: 4px;
+        font-size: 9px;
+        color: #b45309;
+        background: rgba(251, 191, 36, 0.34);
+        border-radius: 999px;
+        text-transform: none;
+      }
+
       main {
         flex: 1;
         display: flex;
@@ -564,6 +576,206 @@
         background: rgba(120, 120, 128, 0.2) !important;
       }
 
+      #hiddenTagsOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(6px);
+        z-index: 130;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .hidden-tags-modal {
+        width: 420px;
+        max-width: calc(100vw - 40px);
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 18px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        max-height: 80vh;
+      }
+
+      .hidden-tags-header {
+        padding: 20px 24px 12px;
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .hidden-tags-header h2 {
+        margin: 0;
+        font-size: 16px;
+        color: var(--text);
+      }
+
+      .hidden-tags-header p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .hidden-tags-close {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: rgba(120, 120, 128, 0.15);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        transition: all 0.2s ease;
+      }
+
+      .hidden-tags-close:hover {
+        background: rgba(120, 120, 128, 0.25);
+      }
+
+      .hidden-tags-body {
+        padding: 18px 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .hidden-tags-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .hidden-tag-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(248, 250, 255, 0.85);
+      }
+
+      .hidden-tag-row-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      .hidden-tag-row input {
+        width: 16px;
+        height: 16px;
+      }
+
+      .hidden-tag-row small {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .hidden-tags-empty {
+        text-align: center;
+        font-size: 13px;
+        color: var(--muted);
+        padding: 12px 0;
+      }
+
+      .hidden-tags-actions {
+        border-top: 1px solid var(--divider);
+        padding: 12px 24px 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: rgba(249, 249, 251, 0.9);
+      }
+
+      #renameTagOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(6px);
+        z-index: 140;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .rename-modal {
+        width: 360px;
+        max-width: calc(100vw - 40px);
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 18px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .rename-header {
+        padding: 20px 24px 12px;
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .rename-header h2 {
+        margin: 0;
+        font-size: 16px;
+        color: var(--text);
+      }
+
+      .rename-header p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .rename-body {
+        padding: 18px 24px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .rename-body label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .rename-body input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        outline: none;
+        font-size: 14px;
+        transition: border 0.2s ease;
+      }
+
+      .rename-body input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.18);
+      }
+
+      .rename-error {
+        min-height: 16px;
+        font-size: 11px;
+        color: #dc2626;
+        visibility: hidden;
+      }
+
+      .rename-actions {
+        padding: 12px 24px 18px;
+      }
+
       @keyframes previewPulse {
         from {
           transform: scale(0.996);
@@ -707,6 +919,8 @@
           ">
             <button class="menu-item" id="menuImport">导入</button>
             <button class="menu-item" id="menuExport">导出</button>
+            <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
+            <button class="menu-item" id="menuHiddenTags">隐藏分类设置</button>
             <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
             <button class="menu-item" id="menuWebdav">WebDAV 同步</button>
           </div>
@@ -891,6 +1105,49 @@
           >
             保存
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="hiddenTagsOverlay">
+      <div class="hidden-tags-modal">
+        <div class="hidden-tags-header">
+          <div>
+            <h2>隐藏分类设置</h2>
+            <p>勾选需要从“全部提示词”中排除的分类。</p>
+          </div>
+          <button id="hiddenTagsClose" class="hidden-tags-close">✕</button>
+        </div>
+        <div class="hidden-tags-body">
+          <div id="hiddenTagsEmpty" class="hidden-tags-empty">
+            暂无分类可设置，请先为提示词添加标签。
+          </div>
+          <div id="hiddenTagsList" class="hidden-tags-list"></div>
+        </div>
+        <div class="hidden-tags-actions">
+          <button id="hiddenTagsCancel" class="ghost-btn">取消</button>
+          <button id="hiddenTagsSave" class="accent-btn">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="renameTagOverlay">
+      <div class="rename-modal">
+        <div class="rename-header">
+          <div>
+            <h2>编辑分类名称</h2>
+            <p>将同步修改所有使用该分类的提示词。</p>
+          </div>
+          <button id="renameTagClose" class="hidden-tags-close">✕</button>
+        </div>
+        <div class="rename-body">
+          <label for="renameTagInput">新的分类名称</label>
+          <input type="text" id="renameTagInput" placeholder="请输入新的分类名称" />
+          <div id="renameTagError" class="rename-error"></div>
+        </div>
+        <div class="hidden-tags-actions rename-actions">
+          <button id="renameTagCancel" class="ghost-btn">取消</button>
+          <button id="renameTagSave" class="accent-btn">保存</button>
         </div>
       </div>
     </div>
@@ -1123,12 +1380,48 @@
                 ">粘贴配置</button>
               </div>
             </div>
+
+            <div style="
+              margin-top: 16px;
+              padding-top: 16px;
+              border-top: 1px solid var(--divider);
+            ">
+              <div style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 8px;
+              ">
+                <div style="
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: var(--muted);
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                ">云端备份列表</div>
+                <div style="
+                  font-size: 12px;
+                  color: var(--muted);
+                ">选择一项后恢复</div>
+              </div>
+              <select id="webdavBackupList" size="6" style="
+                width: 100%;
+                min-height: 168px;
+                padding: 10px 12px;
+                font-size: 13px;
+                color: var(--text);
+                background: rgba(255, 255, 255, 0.92);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                outline: none;
+              "></select>
+            </div>
           </div>
 
           <!-- Hidden fields for compatibility -->
           <input type="hidden" id="webdavRestorePath" />
           <textarea id="webdavConfigJson" style="display: none;"></textarea>
-          <select id="webdavBackupList" style="display: none;"></select>
         </div>
       </div>
     </div>

@@ -69,7 +69,7 @@ async function copyText(text) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
   const navItemsContainer = document.getElementById("sidebar");
   const cardGrid = document.getElementById("cardGrid");
   const searchInput = document.getElementById("searchInput");
@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuImport = document.getElementById("menuImport");
   const menuExport = document.getElementById("menuExport");
   const menuWebdav = document.getElementById("menuWebdav");
+  const menuHiddenTags = document.getElementById("menuHiddenTags");
   const moreMenu = document.getElementById("moreMenu");
   const webdavOverlay = document.getElementById("webdavOverlay");
   const webdavUrl = document.getElementById("webdavUrl");
@@ -113,6 +114,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const webdavRestore = document.getElementById("webdavRestore");
   const webdavClose = document.getElementById("webdavClose");
 
+  const hiddenTagsOverlay = document.getElementById("hiddenTagsOverlay");
+  const hiddenTagsList = document.getElementById("hiddenTagsList");
+  const hiddenTagsEmpty = document.getElementById("hiddenTagsEmpty");
+  const hiddenTagsClose = document.getElementById("hiddenTagsClose");
+  const hiddenTagsCancel = document.getElementById("hiddenTagsCancel");
+  const hiddenTagsSave = document.getElementById("hiddenTagsSave");
+
+  const renameTagOverlay = document.getElementById("renameTagOverlay");
+  const renameTagInput = document.getElementById("renameTagInput");
+  const renameTagError = document.getElementById("renameTagError");
+  const renameTagClose = document.getElementById("renameTagClose");
+  const renameTagCancel = document.getElementById("renameTagCancel");
+  const renameTagSave = document.getElementById("renameTagSave");
+
   // Copy/Paste Config Modal Elements
   const copyConfigOverlay = document.getElementById("copyConfigOverlay");
   const copyConfigClose = document.getElementById("copyConfigClose");
@@ -125,16 +140,164 @@ document.addEventListener("DOMContentLoaded", () => {
   const pasteConfigApply = document.getElementById("pasteConfigApply");
 
   let allPrompts = [];
+  let hiddenTags = [];
   let editingIndex = null;
   let selectedIndex = null;
   let contextMenuTargetIndex = null;
+  let renameTagOriginal = null;
+
+  const normalizeTag = (tag) => (typeof tag === "string" ? tag.trim() : "");
+
+  function sanitizeTagList(list) {
+    if (list == null) return [];
+    const arr = Array.isArray(list) ? list : [list];
+    return Array.from(
+      new Set(
+        arr
+          .map((tag) => normalizeTag(tag))
+          .filter((tag) => tag.length > 0),
+      ),
+    );
+  }
+
+  function isTagHidden(tag) {
+    const normalized = normalizeTag(tag);
+    return normalized.length > 0 && hiddenTags.includes(normalized);
+  }
+
+  function getAllTagNames() {
+    return [
+      ...new Set(
+        allPrompts
+          .map((p) => normalizeTag(p.tag))
+          .filter((tag) => tag.length > 0),
+      ),
+    ];
+  }
+
+  function getVisibleInAllCount() {
+    return allPrompts.filter((item) => !isTagHidden(item.tag)).length;
+  }
+
+  async function loadHiddenTags() {
+    if (!electronAPI?.getHiddenTags) return [];
+    try {
+      const stored = await electronAPI.getHiddenTags();
+      return sanitizeTagList(stored);
+    } catch (err) {
+      console.error("加载隐藏分类失败", err);
+      return [];
+    }
+  }
+
+  async function persistHiddenTags(tags) {
+    const sanitized = sanitizeTagList(tags);
+    if (!electronAPI?.setHiddenTags) {
+      hiddenTags = sanitized;
+      return hiddenTags;
+    }
+    try {
+      const saved = await electronAPI.setHiddenTags(sanitized);
+      hiddenTags = sanitizeTagList(saved);
+    } catch (err) {
+      console.error("保存隐藏分类失败", err);
+      hiddenTags = sanitized;
+    }
+    return hiddenTags;
+  }
+
+  function setRenameTagError(message = "") {
+    if (!renameTagError) return;
+    renameTagError.textContent = message;
+    renameTagError.style.visibility = message ? "visible" : "hidden";
+  }
+
+  function openRenameTagModal(tag) {
+    if (!renameTagOverlay) return;
+    renameTagOriginal = tag;
+    if (renameTagInput) {
+      renameTagInput.value = tag || "";
+      setTimeout(() => {
+        renameTagInput.focus();
+        renameTagInput.select();
+      }, 0);
+    }
+    setRenameTagError("");
+    renameTagOverlay.style.display = "flex";
+  }
+
+  function closeRenameTagModal() {
+    if (!renameTagOverlay) return;
+    renameTagOverlay.style.display = "none";
+    renameTagOriginal = null;
+    setRenameTagError("");
+  }
+
+  async function handleRenameTagSave() {
+    if (!renameTagOriginal) {
+      closeRenameTagModal();
+      return;
+    }
+    const normalizedOld = normalizeTag(renameTagOriginal);
+    if (!normalizedOld) {
+      closeRenameTagModal();
+      return;
+    }
+    const newValue = renameTagInput?.value ?? "";
+    const trimmed = newValue.trim();
+    if (!trimmed) {
+      setRenameTagError("分类名称不能为空");
+      return;
+    }
+    const normalizedNew = normalizeTag(trimmed);
+
+    if (normalizedNew === normalizedOld && trimmed === renameTagOriginal) {
+      closeRenameTagModal();
+      showToast("未做任何更改");
+      return;
+    }
+
+    let changed = false;
+    const updatedPrompts = allPrompts.map((prompt) => {
+      if (normalizeTag(prompt.tag) === normalizedOld) {
+        if (prompt.tag === trimmed) return prompt;
+        changed = true;
+        return { ...prompt, tag: trimmed };
+      }
+      return prompt;
+    });
+
+    if (!changed) {
+      setRenameTagError("未找到需要更新的提示词或未做更改");
+      return;
+    }
+
+    allPrompts = updatedPrompts;
+
+    if (hiddenTags.includes(normalizedOld)) {
+      let updatedHidden = hiddenTags.filter((tag) => tag !== normalizedOld);
+      if (normalizedNew && !updatedHidden.includes(normalizedNew)) {
+        updatedHidden.push(normalizedNew);
+      }
+      await persistHiddenTags(updatedHidden);
+    }
+
+    await saveData();
+    closeRenameTagModal();
+    showToast("分类已重命名");
+  }
 
   // Context Menu Elements
   const contextMenu = document.getElementById("contextMenu");
   const contextPinText = document.getElementById("contextPinText");
 
   (async () => {
-    allPrompts = await loadPrompts();
+    const [prompts, storedHidden] = await Promise.all([
+      loadPrompts(),
+      loadHiddenTags(),
+    ]);
+    allPrompts = prompts;
+    hiddenTags = storedHidden;
     renderAll();
     if (!allPrompts.length) {
       clearPreview();
@@ -169,14 +332,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return config || null;
   }
 
-  async function saveWebdavConfig() {
-    if (!electronAPI?.setWebdavConfig) return;
-    const config = {
+  function collectWebdavConfig() {
+    return {
       url: webdavUrl?.value?.trim() || "",
       username: webdavUsername?.value?.trim() || "",
       password: webdavPassword?.value || "",
       directory: webdavDir?.value?.trim() || "prompt-box-backups",
     };
+  }
+
+  async function saveWebdavConfig() {
+    if (!electronAPI?.setWebdavConfig) return;
+    const config = collectWebdavConfig();
     await electronAPI.setWebdavConfig(config);
     return config;
   }
@@ -184,19 +351,30 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderWebdavBackups(list) {
     if (!webdavBackupList) return;
     webdavBackupList.innerHTML = "";
+    if (webdavRestorePath) {
+      webdavRestorePath.value = "";
+    }
     if (!Array.isArray(list) || list.length === 0) {
       const opt = document.createElement("option");
       opt.value = "";
       opt.textContent = "暂无备份";
+      opt.disabled = true;
+      opt.selected = true;
       webdavBackupList.appendChild(opt);
       return;
     }
     list.forEach((item) => {
       const opt = document.createElement("option");
       opt.value = item.path;
-      opt.textContent = `${item.name} (${item.lastMod})`;
+      const size = Number(item.size);
+      const sizeText =
+        Number.isFinite(size) && size >= 0
+          ? `${(size / 1024).toFixed(size >= 1024 ? 1 : 0)} KB`
+          : "未知大小";
+      opt.textContent = `${item.name} ｜ ${item.lastMod || "未知时间"} ｜ ${sizeText}`;
       webdavBackupList.appendChild(opt);
     });
+    webdavBackupList.selectedIndex = 0;
   }
 
   async function loadWebdavBackups() {
@@ -213,6 +391,68 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeWebdavModal() {
     if (!webdavOverlay) return;
     webdavOverlay.style.display = "none";
+  }
+
+  function openHiddenTagsModal() {
+    if (!hiddenTagsOverlay) return;
+    renderHiddenTagsList();
+    hiddenTagsOverlay.style.display = "flex";
+  }
+
+  function closeHiddenTagsModal() {
+    if (!hiddenTagsOverlay) return;
+    hiddenTagsOverlay.style.display = "none";
+  }
+
+  function renderHiddenTagsList() {
+    if (!hiddenTagsList || !hiddenTagsEmpty) return;
+    const tags = getAllTagNames();
+    hiddenTagsList.innerHTML = "";
+    if (!tags.length) {
+      hiddenTagsEmpty.style.display = "block";
+      hiddenTagsList.style.display = "none";
+      return;
+    }
+    hiddenTagsEmpty.style.display = "none";
+    hiddenTagsList.style.display = "flex";
+    tags.forEach((tag) => {
+      const row = document.createElement("label");
+      row.className = "hidden-tag-row";
+      const left = document.createElement("div");
+      left.className = "hidden-tag-row-left";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = tag;
+      checkbox.checked = hiddenTags.includes(tag);
+      const span = document.createElement("span");
+      span.textContent = tag;
+      left.appendChild(checkbox);
+      left.appendChild(span);
+      const hint = document.createElement("small");
+      hint.textContent = checkbox.checked
+        ? "已从“全部提示词”隐藏"
+        : "显示在“全部提示词”";
+      checkbox.onchange = () => {
+        hint.textContent = checkbox.checked
+          ? "已从“全部提示词”隐藏"
+          : "显示在“全部提示词”";
+      };
+      row.appendChild(left);
+      row.appendChild(hint);
+      hiddenTagsList.appendChild(row);
+    });
+  }
+
+  async function saveHiddenTagsSelection() {
+    if (!hiddenTagsList) return;
+    const checkboxes = hiddenTagsList.querySelectorAll('input[type="checkbox"]');
+    const selected = Array.from(checkboxes)
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.value);
+    await persistHiddenTags(selected);
+    closeHiddenTagsModal();
+    renderAll();
+    showToast("隐藏分类设置已更新");
   }
 
   function showToast(message = "已复制到剪贴板") {
@@ -288,12 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
             showToast(data.isPinned ? "已置顶" : "已取消置顶");
             break;
           case "edit":
-            editingIndex = index;
-            document.getElementById("newName").value = data.name;
-            document.getElementById("newTag").value = data.tag;
-            document.getElementById("newContent").value = data.content;
-            document.getElementById("modalTitle").innerText = "编辑提示词";
-            document.getElementById("modal").style.display = "flex";
+            openEditModal(index);
             break;
           case "delete":
             if (confirm(`确定要删除 "${data.name}" 吗？`)) {
@@ -311,11 +546,30 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderAll() {
     updateSidebarAndDropdown();
     renderCards();
+    if (hiddenTagsOverlay && hiddenTagsOverlay.style.display === "flex") {
+      renderHiddenTagsList();
+    }
+  }
+
+  function openEditModal(index) {
+    const data = allPrompts[index];
+    if (!data) return;
+    editingIndex = index;
+    selectCard(index);
+    const nameInput = document.getElementById("newName");
+    const contentInput = document.getElementById("newContent");
+    if (nameInput) nameInput.value = data.name;
+    if (tagInput) tagInput.value = data.tag;
+    if (contentInput) contentInput.value = data.content;
+    if (modalTitle) modalTitle.innerText = "编辑提示词";
+    if (modal) modal.style.display = "flex";
   }
 
   function applyPreviewTheme(item) {
     if (!previewPanel) return;
-    const base = item ? `${item.name || ""}|${item.tag || ""}` : "default";
+    const base = item
+      ? `${item.name || ""}|${normalizeTag(item.tag) || ""}`
+      : "default";
     let hash = 0;
     for (let i = 0; i < base.length; i += 1) {
       hash = (hash * 31 + base.charCodeAt(i)) % 360;
@@ -328,6 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearPreview() {
+    selectedIndex = null;
     if (previewTitle) previewTitle.textContent = "选择一个提示词";
     if (previewBody) previewBody.textContent = "在左侧选择一个卡片，这里会展示完整内容。";
     if (previewTag) previewTag.textContent = "标签";
@@ -340,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!item) return;
     if (previewTitle) previewTitle.textContent = item.name || "未命名";
     if (previewBody) previewBody.textContent = item.content || "";
-    if (previewTag) previewTag.textContent = item.tag || "默认";
+    if (previewTag) previewTag.textContent = normalizeTag(item.tag) || "默认";
     if (previewPanel) previewPanel.style.opacity = "1";
     applyPreviewTheme(item);
   }
@@ -356,11 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateSidebarAndDropdown() {
-    const tags = [
-      ...new Set(
-        allPrompts.map((p) => p.tag).filter((t) => t && t.trim() !== ""),
-      ),
-    ];
+    const tags = getAllTagNames();
 
     if (tags.length === 0) {
       tagDropdown.innerHTML =
@@ -394,14 +645,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const allLink = createNavLink(
       "all",
       "全部提示词",
-      allPrompts.length,
+      getVisibleInAllCount(),
       currentFilter === "all",
     );
     navItemsContainer.insertBefore(allLink, document.getElementById("addTagBtn"));
 
     tags.forEach((tag) => {
-      const count = allPrompts.filter((p) => p.tag === tag).length;
-      const tagLink = createNavLink(tag, tag, count, currentFilter === tag);
+      const count = allPrompts.filter((p) => normalizeTag(p.tag) === tag).length;
+      const tagLink = createNavLink(tag, tag, count, currentFilter === tag, {
+        hidden: hiddenTags.includes(tag),
+      });
       navItemsContainer.insertBefore(tagLink, document.getElementById("addTagBtn"));
     });
 
@@ -414,10 +667,17 @@ document.addEventListener("DOMContentLoaded", () => {
         item.classList.add("active");
         renderCards();
       };
+      item.oncontextmenu = (e) => {
+        const targetFilter = item.dataset.filter;
+        if (!targetFilter || targetFilter === "all") return;
+        e.preventDefault();
+        openRenameTagModal(targetFilter);
+      };
     });
   }
 
-  function createNavLink(filter, text, count, isActive) {
+  function createNavLink(filter, text, count, isActive, options = {}) {
+    const { hidden = false } = options;
     const a = document.createElement("a");
     a.href = "#";
     a.className = `nav-item ${isActive ? "active" : ""}`;
@@ -425,7 +685,26 @@ document.addEventListener("DOMContentLoaded", () => {
     a.style.display = "flex";
     a.style.alignItems = "center";
     a.style.justifyContent = "space-between";
-    a.innerHTML = `<span>${text}</span><span style="font-size: 10px; opacity: 0.6; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 10px;">${count}</span>`;
+    const label = document.createElement("span");
+    label.textContent = text;
+    label.style.display = "inline-flex";
+    label.style.alignItems = "center";
+    label.style.gap = "4px";
+    if (hidden && filter !== "all") {
+      const flag = document.createElement("span");
+      flag.className = "nav-hidden-flag";
+      flag.textContent = "隐藏";
+      label.appendChild(flag);
+    }
+    const countBadge = document.createElement("span");
+    countBadge.style.fontSize = "10px";
+    countBadge.style.opacity = "0.6";
+    countBadge.style.background = "rgba(0,0,0,0.05)";
+    countBadge.style.padding = "2px 6px";
+    countBadge.style.borderRadius = "10px";
+    countBadge.textContent = count;
+    a.appendChild(label);
+    a.appendChild(countBadge);
     return a;
   }
 
@@ -445,6 +724,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cardGrid.innerHTML = "";
     let visibleCount = 0;
+    const visibleIndices = [];
     const displayList = [...allPrompts]
       .map((item, originalIndex) => ({ ...item, originalIndex }))
       .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
@@ -453,8 +733,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const matchesSearch =
         item.name.toLowerCase().includes(term) ||
         item.content.toLowerCase().includes(term);
+      const normalizedTag = normalizeTag(item.tag);
       const matchesCategory =
-        activeFilter === "all" || item.tag === activeFilter;
+        activeFilter === "all"
+          ? !isTagHidden(normalizedTag)
+          : normalizedTag === activeFilter;
 
       if (matchesSearch && matchesCategory) {
         visibleCount += 1;
@@ -498,9 +781,9 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="card-title">${item.name}</div>
               <div class="card-body">${item.content}</div>
             </div>
-            <div class="card-actions" style="display: none; flex-shrink: 0;">
+            <div class="card-actions" style="flex-shrink: 0;">
               <span class="card-meta">
-                <span class="card-tag">${item.tag || "默认"}</span>
+                <span class="card-tag">${normalizedTag || "默认"}</span>
               </span>
               <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
               <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
@@ -542,18 +825,17 @@ document.addEventListener("DOMContentLoaded", () => {
           };
         }
         cardGrid.appendChild(card);
+        visibleIndices.push(item.originalIndex);
       }
     });
 
     if (resultCount) {
       resultCount.textContent = String(visibleCount);
     }
-    if (selectedIndex === null || !displayList.some((i) => i.originalIndex === selectedIndex)) {
-      if (displayList.length > 0) {
-        selectCard(displayList[0].originalIndex);
-      } else {
-        clearPreview();
-      }
+    if (visibleIndices.length === 0) {
+      clearPreview();
+    } else if (!visibleIndices.includes(selectedIndex)) {
+      selectCard(visibleIndices[0]);
     }
 
     attachDynamicEvents();
@@ -582,14 +864,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".edit-btn").forEach((btn) => {
       btn.onclick = (e) => {
         e.stopPropagation();
-        editingIndex = Number(btn.dataset.index);
-        const data = allPrompts[editingIndex];
-        selectCard(editingIndex);
-        document.getElementById("newName").value = data.name;
-        document.getElementById("newTag").value = data.tag;
-        document.getElementById("newContent").value = data.content;
-        modalTitle.innerText = "编辑提示词";
-        modal.style.display = "flex";
+        const idx = Number(btn.dataset.index);
+        openEditModal(idx);
       };
     });
   }
@@ -685,6 +961,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (moreMenu) moreMenu.style.display = "none";
   };
 
+  if (menuHiddenTags) {
+    menuHiddenTags.onclick = () => {
+      openHiddenTagsModal();
+      if (moreMenu) moreMenu.style.display = "none";
+    };
+  }
+
   if (menuWebdav) menuWebdav.onclick = () => {
     (async () => {
       openWebdavModal();
@@ -733,14 +1016,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (previewEdit) {
     previewEdit.onclick = () => {
       if (selectedIndex === null) return;
-      const data = allPrompts[selectedIndex];
-      if (!data) return;
-      editingIndex = selectedIndex;
-      document.getElementById("newName").value = data.name;
-      document.getElementById("newTag").value = data.tag;
-      document.getElementById("newContent").value = data.content;
-      modalTitle.innerText = "编辑提示词";
-      modal.style.display = "flex";
+      openEditModal(selectedIndex);
     };
   }
 
@@ -748,9 +1024,63 @@ document.addEventListener("DOMContentLoaded", () => {
     webdavClose.onclick = () => closeWebdavModal();
   }
 
+  if (hiddenTagsClose) {
+    hiddenTagsClose.onclick = () => closeHiddenTagsModal();
+  }
+
+  if (hiddenTagsCancel) {
+    hiddenTagsCancel.onclick = () => closeHiddenTagsModal();
+  }
+
+  if (hiddenTagsSave) {
+    hiddenTagsSave.onclick = () => {
+      saveHiddenTagsSelection();
+    };
+  }
+
+  if (renameTagClose) {
+    renameTagClose.onclick = () => closeRenameTagModal();
+  }
+
+  if (renameTagCancel) {
+    renameTagCancel.onclick = () => closeRenameTagModal();
+  }
+
+  if (renameTagSave) {
+    renameTagSave.onclick = () => {
+      handleRenameTagSave().catch((err) => {
+        console.error("重命名分类失败", err);
+        setRenameTagError(err?.message || "重命名失败");
+      });
+    };
+  }
+
   if (webdavOverlay) {
     webdavOverlay.addEventListener("click", (e) => {
       if (e.target === webdavOverlay) closeWebdavModal();
+    });
+  }
+
+  if (hiddenTagsOverlay) {
+    hiddenTagsOverlay.addEventListener("click", (e) => {
+      if (e.target === hiddenTagsOverlay) closeHiddenTagsModal();
+    });
+  }
+
+  if (renameTagOverlay) {
+    renameTagOverlay.addEventListener("click", (e) => {
+      if (e.target === renameTagOverlay) closeRenameTagModal();
+    });
+  }
+
+  if (renameTagInput) {
+    renameTagInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        handleRenameTagSave().catch((err) => {
+          console.error("重命名分类失败", err);
+          setRenameTagError(err?.message || "重命名失败");
+        });
+      }
     });
   }
 
@@ -783,6 +1113,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await saveWebdavConfig();
         const result = await electronAPI.backupWebdav();
+        await loadWebdavBackups();
         if (result?.fileName) {
           showToast(`已备份：${result.fileName}`);
         } else {
@@ -806,10 +1137,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const selected = webdavBackupList?.value;
         if (path) {
           result = await electronAPI.restoreWebdavPath(path);
-        } else if (selected) {
+        } else if (selected && selected.trim()) {
           result = await electronAPI.restoreWebdavPath(selected);
         } else {
-          result = await electronAPI.restoreWebdavLatest();
+          alert("暂无可恢复的云端备份，请先刷新列表或立即备份。");
+          return;
         }
         allPrompts = await loadPrompts();
         renderAll();

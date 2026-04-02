@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   importPrompts: () => ipcRenderer.invoke("import-prompts"),
   getPrompts: () => ipcRenderer.invoke("get-prompts"),
   setPrompts: (prompts) => ipcRenderer.invoke("set-prompts", prompts),
+  getHiddenTags: () => ipcRenderer.invoke("get-hidden-tags"),
+  setHiddenTags: (tags) => ipcRenderer.invoke("set-hidden-tags", tags),
   getWebdavConfig: () => ipcRenderer.invoke("webdav-get-config"),
   setWebdavConfig: (config) => ipcRenderer.invoke("webdav-set-config", config),
   testWebdav: () => ipcRenderer.invoke("webdav-test"),

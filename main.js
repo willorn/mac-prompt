@@ -49,6 +49,29 @@ const webdavStore = new Store({
   },
 });
 
+function sanitizeHiddenTagInput(input) {
+  if (input == null) return [];
+  const arr = Array.isArray(input) ? input : [input];
+  return Array.from(
+    new Set(
+      arr
+        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+        .filter((tag) => tag.length > 0),
+    ),
+  );
+}
+
+function getHiddenTagsFromStore() {
+  const raw = dataStore.get("hiddenTags");
+  return sanitizeHiddenTagInput(raw);
+}
+
+function setHiddenTagsInStore(tags) {
+  const sanitized = sanitizeHiddenTagInput(tags);
+  dataStore.set("hiddenTags", sanitized);
+  return sanitized;
+}
+
 let mainWindow = null;
 let tray = null;
 let isHiddenOffscreen = false;
@@ -364,6 +387,14 @@ ipcMain.handle("import-prompts", async () => {
 ipcMain.handle("get-prompts", () => {
   const prompts = dataStore.get("prompts");
   return Array.isArray(prompts) ? prompts : null;
+});
+
+ipcMain.handle("get-hidden-tags", () => {
+  return getHiddenTagsFromStore();
+});
+
+ipcMain.handle("set-hidden-tags", (_event, tags) => {
+  return setHiddenTagsInStore(tags);
 });
 
 ipcMain.handle("set-prompts", (_event, prompts) => {
