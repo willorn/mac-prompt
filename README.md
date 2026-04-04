@@ -8,8 +8,6 @@
 
 本项目来源于 https://github.com/fantasyao/prompt-master 。
 
-![screenshot](assets/screenshot.png)
-
 ## ✨ 为什么选择 PromptBox？
 
 | 痛点 | 解决方案 |
@@ -25,9 +23,9 @@
 
 前往 [Releases](https://github.com/willorn/prompt-box-electron/releases) 页面下载最新版本：
 
-- **macOS**: `Prompt-Master-x.x.x.dmg`
-- **Windows**: `Prompt-Master-x.x.x.exe` (计划中)
-- **Linux**: `Prompt-Master-x.x.x.AppImage` (计划中)
+- **macOS**: `PromptBox-x.x.x.dmg`
+- **Windows**: `PromptBox-x.x.x.exe` (计划中)
+- **Linux**: `PromptBox-x.x.x.AppImage` (计划中)
 
 ### 从源码运行
 
@@ -53,7 +51,20 @@ bun run build
 **使用提示词**
 1. 按 `Alt+E` 呼出窗口（或点击托盘图标）
 2. 点击需要的提示词卡片
-3. 窗口自动隐藏，提示词已在你光标处，直接粘贴即可
+3. 已授权辅助功能时，内容会自动粘贴到当前输入位置；未授权时会先复制到剪贴板并提示授权
+
+### macOS 权限说明
+
+首次使用以下功能时，macOS 可能会要求你授权：
+
+- **自动粘贴**：需要「辅助功能」权限
+- **全局快捷键 `Alt+E`**：某些机器上同样可能依赖「辅助功能」权限
+
+建议优先测试打包版 `PromptBox.app`。如果功能未生效，请前往：
+
+`系统设置 -> 隐私与安全性 -> 辅助功能`
+
+确认 `PromptBox` 已被允许控制电脑。
 
 **添加提示词**
 1. 点击左下角「新增」
@@ -85,7 +96,7 @@ bun run build
 ## 🎨 核心特性
 
 ### 即点即用
-点击任意提示词卡片，内容自动复制到剪贴板，窗口立即隐藏，光标回到原来的输入框。无需手动切换窗口，不打断工作流。
+点击任意提示词卡片后，应用会优先尝试自动粘贴到当前输入位置；如果系统权限未授权，则回退为复制到剪贴板并提示用户授权。窗口会自动隐藏，尽量不打断工作流。
 
 ### 优雅的苹果风格
 没有繁杂的按钮和菜单，界面干净得像原生 macOS 应用。半透明效果、圆润的边角、流畅的动画，每一次交互都是一种享受。
@@ -98,7 +109,7 @@ bun run build
 
 ### 多端同步（WebDAV）
 - 支持坚果云、Nextcloud 等任意 WebDAV 服务
-- 自动备份：设置一次，每天自动备份到云端
+- 自动备份：设置一次，按配置频率自动备份到云端
 - 配置迁移：复制配置 → 新设备粘贴 → 完成，无需重复填写服务器信息
 
 ## ⌨️ 快捷键
@@ -106,9 +117,9 @@ bun run build
 | 快捷键 | 功能 |
 |--------|------|
 | `Alt+E` | 显示/隐藏主窗口 |
-| `↑/↓` | 在卡片间切换 |
-| `Enter` | 选中并复制 |
-| `Tab` | 切换焦点 |
+| `Tab` | 从搜索框切换到结果列表 |
+| `←/→` | 在卡片间切换焦点 |
+| `Enter` | 当前版本下仍建议优先使用鼠标点击卡片内容 |
 
 ## 🛠️ 技术栈
 
@@ -122,9 +133,11 @@ bun run build
 ```
 prompt-box-electron/
 ├── assets/                 # 静态资源
-│   └── trayTemplate.png   # 托盘图标
+│   └── trayTemplate.png    # 托盘图标
 ├── docs/                   # 文档
-│   └── WEBDAV.md          # WebDAV 配置说明
+│   ├── CHANGELOG.md        # 更新日志
+│   ├── CONTRIBUTING.md     # 贡献指南
+│   └── WEBDAV.md           # WebDAV 配置说明
 ├── index.html             # 主界面
 ├── main.js                # 主进程
 ├── preload.cjs            # 预加载脚本
@@ -135,11 +148,11 @@ prompt-box-electron/
 
 ## 🤝 贡献指南
 
-欢迎提交 Issue 和 Pull Request！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
+欢迎提交 Issue 和 Pull Request！请阅读 [贡献指南](docs/CONTRIBUTING.md) 了解详情。
 
 ## 📝 更新日志
 
-查看 [CHANGELOG.md](CHANGELOG.md) 了解版本更新历史。
+查看 [更新日志](docs/CHANGELOG.md) 了解版本更新历史。
 
 ## 📄 许可证
 

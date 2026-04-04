@@ -34,7 +34,7 @@
 ### 前置要求
 
 - [Bun](https://bun.sh/) >= 1.3.4
-- [Node.js](https://nodejs.org/) >= 18 (可选，Bun 已包含)
+- [Node.js](https://nodejs.org/) >= 18
 - Git
 
 ### 本地开发
@@ -53,14 +53,16 @@ bun run dev
 
 ### 项目结构
 
-```
+```text
 prompt-box-electron/
-├── main.js           # Electron 主进程
-├── preload.cjs       # 预加载脚本（安全桥梁）
-├── renderer.js       # 渲染进程逻辑
+├── assets/           # 静态资源
+├── docs/             # 项目文档
 ├── index.html        # 主界面
+├── main.js           # Electron 主进程
 ├── package.json      # 项目配置
-└── assets/           # 静态资源
+├── preload.cjs       # 预加载脚本
+├── README.md         # 总览文档
+└── renderer.js       # 渲染进程逻辑
 ```
 
 ### 代码规范
@@ -73,8 +75,8 @@ prompt-box-electron/
 ## 📤 提交 Pull Request
 
 1. **Fork 项目** 到你的 GitHub 账号
-
 2. **创建分支**
+
    ```bash
    git checkout -b feature/your-feature-name
    # 或
@@ -82,6 +84,7 @@ prompt-box-electron/
    ```
 
 3. **提交更改**
+
    ```bash
    git add .
    git commit -m "feat: 添加新功能描述"
@@ -90,6 +93,7 @@ prompt-box-electron/
    ```
 
 4. **推送分支**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -112,7 +116,8 @@ prompt-box-electron/
 - `chore:` - 构建/工具相关
 
 示例：
-```
+
+```text
 feat: 添加暗黑模式支持
 fix: 修复搜索框失焦问题
 docs: 更新 WebDAV 配置说明
@@ -133,8 +138,8 @@ docs: 更新 WebDAV 配置说明
 
 ## ❓ 需要帮助？
 
-- 查看 [FAQ](README.md#常见问题)
-- 阅读 [WebDAV 配置指南](docs/WEBDAV.md)
+- 阅读总览文档 [README.md](../README.md)
+- 阅读 [WebDAV 配置指南](./WEBDAV.md)
 - 在 Discussions 中提问
 
 ## 🙏 行为准则

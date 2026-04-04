@@ -12,6 +12,7 @@ bun.lockb
 # Build output
 dist/
 release/
+*.zip
 
 # OS files
 .DS_Store
@@ -35,5 +36,3 @@ coverage/
 # Application data (development)
 # 注意：生产环境的数据存储在用户目录，不会被提交
 prompts.json
-
-test11111111
