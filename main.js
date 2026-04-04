@@ -29,6 +29,13 @@ function getAssetPath(...paths) {
   return path.join(__dirname, ...paths);
 }
 
+function getExtraResourcePath(...paths) {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, ...paths);
+  }
+  return path.join(__dirname, ...paths);
+}
+
 const store = new Store({
   name: "window-state",
   defaults: {
@@ -251,7 +258,7 @@ function toggleMainWindow() {
 }
 
 function setupTray() {
-  const iconPath = getAssetPath("assets", "trayTemplate.png");
+  const iconPath = getExtraResourcePath("assets", "trayTemplate.png");
   console.log("托盘图标路径:", iconPath);
   tray = new Tray(iconPath);
 
@@ -287,8 +294,12 @@ function setupGlobalShortcut() {
 
 app.whenReady().then(() => {
   createMainWindow();
-  setupTray();
   setupGlobalShortcut();
+  try {
+    setupTray();
+  } catch (error) {
+    console.error("托盘初始化失败", error);
+  }
   scheduleAutoBackup();
 
   app.on("activate", () => {
