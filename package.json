@@ -10,7 +10,8 @@
     "bd": "bun dev",
     "start": "electron .",
     "build": "electron-builder --mac",
-    "build:dir": "electron-builder --mac --dir"
+    "build:dir": "electron-builder --mac --dir",
+    "preview:ui": "bash ./scripts/preview-packaged-ui.sh"
   },
   "devDependencies": {
     "electron": "^32.2.0",

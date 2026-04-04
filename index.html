@@ -784,6 +784,447 @@
           transform: scale(1);
         }
       }
+
+      /* Neo-Brutalist theme override */
+      :root {
+        --bg: #f6e9c9;
+        --paper: #fff9ef;
+        --panel: #fffdf7;
+        --ink: #101010;
+        --accent: #ff6b3d;
+        --accent-soft: #ffd84d;
+        --accent-cool: #5ee2d5;
+        --accent-pink: #ff8fcb;
+        --accent-lime: #c8ff63;
+        --muted: #3f3a33;
+        --border: #101010;
+        --divider: #101010;
+        --shadow-soft: 6px 6px 0 #101010;
+      }
+
+      body {
+        font-family: "Avenir Next Condensed", "Arial Narrow", "PingFang SC",
+          "Noto Sans CJK SC", sans-serif;
+        background:
+          linear-gradient(180deg, #ffd84d 0 18%, #f6e9c9 18% 100%),
+          repeating-linear-gradient(
+            -45deg,
+            rgba(16, 16, 16, 0.05) 0 16px,
+            rgba(16, 16, 16, 0) 16px 32px
+          );
+        color: var(--ink);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(90deg, transparent 0 94%, rgba(16, 16, 16, 0.08) 94% 95%, transparent 95% 100%),
+          linear-gradient(0deg, transparent 0 94%, rgba(16, 16, 16, 0.08) 94% 95%, transparent 95% 100%);
+        background-size: 36px 36px;
+        opacity: 0.55;
+      }
+
+      aside,
+      header,
+      .list-scroll,
+      .preview-panel,
+      .hidden-tags-modal,
+      .rename-modal,
+      .webdav-modal,
+      #modalOverlay > div,
+      #copyConfigOverlay > div,
+      #pasteConfigOverlay > div,
+      #moreMenu,
+      #contextMenu {
+        border: 3px solid var(--ink) !important;
+        border-radius: 8px !important;
+        box-shadow: 8px 8px 0 var(--ink) !important;
+      }
+
+      aside {
+        width: 196px;
+        background: var(--accent-soft) !important;
+        padding: 20px 14px;
+        gap: 10px;
+        border-right: 3px solid var(--ink);
+        backdrop-filter: none;
+      }
+
+      .logo {
+        margin: 0 0 16px;
+        padding: 10px 8px;
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 1.8px;
+        line-height: 1;
+        text-transform: uppercase;
+        background: var(--panel);
+        border: 3px solid var(--ink);
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
+      .nav-item {
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--ink);
+        background: var(--panel);
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+      }
+
+      .nav-item:hover {
+        background: var(--accent-cool);
+        color: var(--ink);
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+
+      .nav-item.active {
+        background: var(--accent) !important;
+        color: var(--ink) !important;
+        font-weight: 900;
+        border-left: 3px solid var(--ink);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+
+      .nav-hidden-flag {
+        padding: 1px 6px;
+        font-size: 9px;
+        font-weight: 900;
+        color: var(--ink);
+        background: var(--accent-pink);
+        border: 2px solid var(--ink);
+        border-radius: 4px;
+      }
+
+      main {
+        background: transparent;
+      }
+
+      header {
+        background: var(--accent) !important;
+        border-bottom: 3px solid var(--ink) !important;
+        box-shadow: 0 8px 0 var(--ink) !important;
+        border-radius: 0 !important;
+        z-index: 60;
+      }
+
+      .search-wrapper::before {
+        opacity: 1;
+        filter: grayscale(1) contrast(100);
+      }
+
+      .search-input,
+      .modal-input,
+      .modal-textarea,
+      .webdav-input,
+      .rename-body input,
+      #copyConfigText,
+      #pasteConfigText,
+      select {
+        border: 3px solid var(--ink) !important;
+        border-radius: 8px !important;
+        background: var(--panel) !important;
+        color: var(--ink) !important;
+        box-shadow: 4px 4px 0 var(--ink) !important;
+        font-size: 13px;
+      }
+
+      .search-input {
+        max-width: 460px;
+        height: 42px;
+        padding-left: 36px;
+        font-weight: 700;
+        background: #fff7d1 !important;
+      }
+
+      .search-input:focus,
+      .modal-input:focus,
+      .modal-textarea:focus,
+      .webdav-input:focus,
+      .rename-body input:focus,
+      #pasteConfigText:focus {
+        outline: none;
+        box-shadow: 6px 6px 0 var(--ink) !important;
+        border-color: var(--ink) !important;
+      }
+
+      #clearSearchBtn,
+      #settingsBtn,
+      button,
+      .menu-item,
+      .ghost-btn,
+      .accent-btn,
+      .hidden-tags-close,
+      #webdavClose,
+      .context-menu-item {
+        border: 3px solid var(--ink) !important;
+        border-radius: 8px !important;
+        box-shadow: 4px 4px 0 var(--ink) !important;
+        background: var(--panel) !important;
+        color: var(--ink) !important;
+        font-family: inherit;
+        font-weight: 800;
+        transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+      }
+
+      #clearSearchBtn {
+        width: 22px !important;
+        height: 22px !important;
+        background: var(--panel) !important;
+        color: var(--ink) !important;
+      }
+
+      #settingsBtn {
+        background: var(--paper) !important;
+        font-size: 18px !important;
+      }
+
+      button:hover,
+      .menu-item:hover,
+      .ghost-btn:hover,
+      .accent-btn:hover,
+      .hidden-tags-close:hover,
+      #webdavClose:hover,
+      #clearSearchBtn:hover,
+      #settingsBtn:hover,
+      .context-menu-item:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--ink) !important;
+      }
+
+      button:active,
+      .menu-item:active,
+      .ghost-btn:active,
+      .accent-btn:active,
+      .hidden-tags-close:active,
+      #webdavClose:active,
+      #clearSearchBtn:active,
+      #settingsBtn:active,
+      .context-menu-item:active {
+        transform: translate(4px, 4px);
+        box-shadow: 0 0 0 var(--ink) !important;
+      }
+
+      #addBtn,
+      #saveBtn,
+      #previewEdit,
+      #hiddenTagsSave,
+      #renameTagSave,
+      #webdavBackup,
+      #copyConfigBtn,
+      #pasteConfigApply {
+        background: var(--accent-soft) !important;
+      }
+
+      #cancelBtn,
+      #hiddenTagsCancel,
+      #renameTagCancel,
+      #pasteConfigCancel,
+      #webdavRestore,
+      #webdavCopyConfig,
+      #webdavPasteConfig,
+      #webdavTest {
+        background: var(--accent-cool) !important;
+      }
+
+      .content-wrap {
+        padding: 20px 22px 24px;
+        gap: 18px;
+      }
+
+      .list-header {
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+      }
+
+      .list-scroll {
+        background: var(--paper) !important;
+        padding: 10px;
+        gap: 10px;
+        backdrop-filter: none;
+      }
+
+      .card {
+        padding: 12px 14px;
+        background: var(--panel);
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+      }
+
+      .card:hover {
+        background: #ffffff;
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+
+      .card:focus {
+        background: var(--accent-soft);
+        outline: none;
+      }
+
+      .card.active-card {
+        background: var(--accent-soft);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+
+      .card-title {
+        font-size: 14px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .card-body {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .card-tag,
+      .preview-tag {
+        border: 2px solid var(--ink);
+        border-radius: 6px;
+        background: var(--accent-pink) !important;
+        color: var(--ink) !important;
+        font-weight: 900;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+
+      .preview-panel {
+        background: var(--accent-cool) !important;
+        padding: 22px 24px;
+        gap: 16px;
+        backdrop-filter: none;
+      }
+
+      .preview-title {
+        font-size: 26px;
+        line-height: 1;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .preview-body {
+        font-size: 14px;
+        line-height: 1.7;
+        font-weight: 700;
+      }
+
+      #moreMenu,
+      #contextMenu {
+        background: var(--accent-soft) !important;
+        padding: 8px !important;
+        min-width: 180px;
+        backdrop-filter: none;
+      }
+
+      .menu-item {
+        margin-bottom: 6px;
+        text-align: center;
+      }
+
+      .menu-item:last-child {
+        margin-bottom: 0;
+      }
+
+      #toast {
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        background: var(--accent-soft) !important;
+        color: var(--ink) !important;
+        box-shadow: 6px 6px 0 var(--ink);
+        font-weight: 900;
+      }
+
+      #modalOverlay,
+      #webdavOverlay,
+      #hiddenTagsOverlay,
+      #renameTagOverlay,
+      #copyConfigOverlay,
+      #pasteConfigOverlay {
+        background:
+          rgba(16, 16, 16, 0.22) !important;
+        backdrop-filter: blur(1px) !important;
+      }
+
+      #modalOverlay > div,
+      .webdav-modal,
+      .hidden-tags-modal,
+      .rename-modal,
+      #copyConfigOverlay > div,
+      #pasteConfigOverlay > div {
+        background: var(--paper) !important;
+      }
+
+      .hidden-tag-row {
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .hidden-tags-actions,
+      .rename-actions {
+        background: transparent;
+      }
+
+      .switch-slider {
+        border: 3px solid var(--ink);
+        background: var(--panel);
+      }
+
+      .switch-slider::before {
+        border: 3px solid var(--ink);
+        box-shadow: none;
+      }
+
+      .switch input:checked + .switch-slider {
+        background: var(--accent-lime);
+      }
+
+      .switch input:checked + .switch-slider::before {
+        transform: translateX(18px);
+        background: var(--accent);
+      }
+
+      .webdav-label,
+      .modal-field label,
+      .rename-body label {
+        color: var(--ink);
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+
+      .modal-subtitle,
+      .modal-hint,
+      .hidden-tags-header p,
+      .rename-header p {
+        color: var(--muted);
+      }
+
+      .context-menu-item {
+        margin-bottom: 6px;
+        background: var(--panel) !important;
+      }
+
+      .context-menu-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .context-menu-item span {
+        color: var(--ink);
+      }
     </style>
     <script type="module" src="./renderer.js" defer></script>
   </head>
