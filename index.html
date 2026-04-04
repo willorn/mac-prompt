@@ -152,11 +152,6 @@
         opacity: 0.8;
       }
 
-      #clearSearchBtn:hover {
-        background: rgba(120, 120, 128, 0.36) !important;
-        transform: scale(1.05);
-      }
-
       .content-wrap {
         padding: 18px 20px 22px;
         display: grid;
@@ -988,7 +983,6 @@
         border-color: var(--ink) !important;
       }
 
-      #clearSearchBtn,
       #settingsBtn,
       button,
       .menu-item,
@@ -1005,13 +999,6 @@
         font-family: inherit;
         font-weight: 800;
         transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
-      }
-
-      #clearSearchBtn {
-        width: 22px !important;
-        height: 22px !important;
-        background: var(--panel) !important;
-        color: var(--ink) !important;
       }
 
       #settingsBtn {
@@ -1247,7 +1234,6 @@
         text-transform: uppercase;
       }
 
-      #clearSearchBtn,
       #settingsBtn,
       .hidden-tags-close,
       #webdavClose {
@@ -1258,7 +1244,6 @@
         box-shadow: 3px 3px 0 var(--ink) !important;
       }
 
-      #clearSearchBtn:hover,
       #settingsBtn:hover,
       .hidden-tags-close:hover,
       #webdavClose:hover {
@@ -1267,7 +1252,6 @@
         background: #fffdf7 !important;
       }
 
-      #clearSearchBtn:active,
       #settingsBtn:active,
       .hidden-tags-close:active,
       #webdavClose:active {
@@ -1677,7 +1661,6 @@
         background: #fff4c5 !important;
       }
 
-      #clearSearchBtn,
       #settingsBtn,
       .hidden-tags-close,
       #webdavClose,
@@ -1688,7 +1671,6 @@
         transform: none !important;
       }
 
-      #clearSearchBtn,
       #settingsBtn,
       .hidden-tags-close,
       #webdavClose {
@@ -1698,7 +1680,6 @@
         background: var(--nb-surface) !important;
       }
 
-      #clearSearchBtn:hover,
       #settingsBtn:hover,
       .hidden-tags-close:hover,
       #webdavClose:hover {
@@ -1917,31 +1898,6 @@
               placeholder="搜索"
             />
 
-            <button
-              id="clearSearchBtn"
-              style="
-                display: none;
-                position: absolute;
-                right: 8px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 18px;
-                height: 18px;
-                border: none;
-                background: rgba(120, 120, 128, 0.24);
-                color: white;
-                cursor: pointer;
-                align-items: center;
-                justify-content: center;
-                border-radius: 50%;
-                padding: 0;
-                font-size: 11px;
-                z-index: 5;
-                transition: all 0.2s ease;
-              "
-            >
-              ✕
-            </button>
           </div>
           <button
             id="settingsBtn"

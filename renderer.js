@@ -118,7 +118,6 @@ function escapeHtml(value) {
   const navItemsContainer = document.getElementById("sidebar");
   const cardGrid = document.getElementById("cardGrid");
   const searchInput = document.getElementById("searchInput");
-  const clearSearchBtn = document.getElementById("clearSearchBtn");
   const modal = document.getElementById("modalOverlay");
   const modalTitle = modal.querySelector("h2");
   const settingsBtn = document.getElementById("settingsBtn");
@@ -930,11 +929,6 @@ function escapeHtml(value) {
   }
 
   searchInput.addEventListener("input", () => {
-    if (searchInput.value.trim().length > 0) {
-      clearSearchBtn.style.display = "flex";
-    } else {
-      clearSearchBtn.style.display = "none";
-    }
     renderCards();
   });
 
@@ -947,13 +941,6 @@ function escapeHtml(value) {
       }
     }
   });
-
-  clearSearchBtn.onclick = () => {
-    searchInput.value = "";
-    clearSearchBtn.style.display = "none";
-    searchInput.focus();
-    renderCards();
-  };
 
   saveBtn.onclick = async () => {
     const name = document.getElementById("newName").value.trim();
