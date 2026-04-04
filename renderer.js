@@ -799,9 +799,9 @@ async function copyPromptForUse(text) {
               <span class="card-meta">
                 <span class="card-tag">${normalizedTag || "默认"}</span>
               </span>
-              <button class="pin-btn" data-index="${item.originalIndex}" style="color: ${item.isPinned ? "#0a84ff" : "#9a9aa0"};">Pin</button>
-              <button class="edit-btn" data-index="${item.originalIndex}">Edit</button>
-              <button class="delete-btn" data-index="${item.originalIndex}">Del</button>
+              <button class="pin-btn" data-index="${item.originalIndex}" style="color: #101010;">置顶</button>
+              <button class="edit-btn" data-index="${item.originalIndex}">编辑</button>
+              <button class="delete-btn" data-index="${item.originalIndex}">删除</button>
             </div>
           </div>
         `;

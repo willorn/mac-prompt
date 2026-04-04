@@ -855,15 +855,32 @@
 
       .logo {
         margin: 0 0 16px;
-        padding: 10px 8px;
+        padding: 12px 10px 10px;
         font-size: 18px;
         font-weight: 900;
         letter-spacing: 1.8px;
-        line-height: 1;
+        line-height: 1.05;
         text-transform: uppercase;
         background: var(--panel);
         border: 3px solid var(--ink);
         box-shadow: 5px 5px 0 var(--ink);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .logo small {
+        display: inline-block;
+        width: fit-content;
+        padding: 2px 6px;
+        background: var(--accent-cool);
+        border: 2px solid var(--ink);
+        border-radius: 4px;
+        box-shadow: 3px 3px 0 var(--ink);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        text-transform: none;
       }
 
       .nav-item {
@@ -901,6 +918,22 @@
         background: var(--accent-pink);
         border: 2px solid var(--ink);
         border-radius: 4px;
+      }
+
+      #addTagBtn {
+        display: none;
+        width: 100%;
+        margin: 8px 0;
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+        font-weight: 900;
+        letter-spacing: 0.6px;
+        color: var(--ink) !important;
+        background: var(--paper) !important;
+        border: 3px dashed var(--ink) !important;
+        border-radius: 8px !important;
+        box-shadow: 4px 4px 0 var(--ink);
+        cursor: pointer;
       }
 
       main {
@@ -986,30 +1019,36 @@
         font-size: 18px !important;
       }
 
-      button:hover,
       .menu-item:hover,
       .ghost-btn:hover,
       .accent-btn:hover,
-      .hidden-tags-close:hover,
-      #webdavClose:hover,
-      #clearSearchBtn:hover,
-      #settingsBtn:hover,
-      .context-menu-item:hover {
+      #addBtn:hover,
+      #saveBtn:hover,
+      #previewEdit:hover,
+      #hiddenTagsSave:hover,
+      #renameTagSave:hover,
+      #webdavBackup:hover,
+      #copyConfigBtn:hover,
+      #pasteConfigApply:hover,
+      .card-actions button:hover {
         transform: translate(-2px, -2px);
         box-shadow: 6px 6px 0 var(--ink) !important;
       }
 
-      button:active,
       .menu-item:active,
       .ghost-btn:active,
       .accent-btn:active,
-      .hidden-tags-close:active,
-      #webdavClose:active,
-      #clearSearchBtn:active,
-      #settingsBtn:active,
-      .context-menu-item:active {
-        transform: translate(4px, 4px);
-        box-shadow: 0 0 0 var(--ink) !important;
+      #addBtn:active,
+      #saveBtn:active,
+      #previewEdit:active,
+      #hiddenTagsSave:active,
+      #renameTagSave:active,
+      #webdavBackup:active,
+      #copyConfigBtn:active,
+      #pasteConfigApply:active,
+      .card-actions button:active {
+        transform: translate(3px, 3px);
+        box-shadow: 1px 1px 0 var(--ink) !important;
       }
 
       #addBtn,
@@ -1039,6 +1078,11 @@
         gap: 18px;
       }
 
+      .list-panel,
+      .preview-panel {
+        position: relative;
+      }
+
       .list-header {
         color: var(--ink);
         font-size: 12px;
@@ -1046,11 +1090,38 @@
         letter-spacing: 0.8px;
       }
 
+      .list-header > span,
+      .preview-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        background: var(--accent-pink);
+        border: 3px solid var(--ink);
+        border-radius: 6px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      #resultCount {
+        min-width: 34px;
+        text-align: center;
+        padding: 5px 8px;
+        background: var(--accent-lime);
+        border: 3px solid var(--ink);
+        border-radius: 6px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
       .list-scroll {
         background: var(--paper) !important;
         padding: 10px;
         gap: 10px;
         backdrop-filter: none;
+      }
+
+      .list-scroll::before,
+      .list-scroll::after,
+      .preview-panel::before {
+        content: none;
       }
 
       .card {
@@ -1076,6 +1147,22 @@
       .card.active-card {
         background: var(--accent-soft);
         box-shadow: 6px 6px 0 var(--ink);
+      }
+
+      .card:nth-child(4n + 1) {
+        background: #fff5d6;
+      }
+
+      .card:nth-child(4n + 2) {
+        background: #fff7fb;
+      }
+
+      .card:nth-child(4n + 3) {
+        background: #efffff;
+      }
+
+      .card:nth-child(4n + 4) {
+        background: #f7ffe8;
       }
 
       .card-title {
@@ -1107,6 +1194,10 @@
         backdrop-filter: none;
       }
 
+      .preview-header {
+        gap: 10px;
+      }
+
       .preview-title {
         font-size: 26px;
         line-height: 1;
@@ -1119,6 +1210,11 @@
         font-size: 14px;
         line-height: 1.7;
         font-weight: 700;
+        background: var(--panel);
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        box-shadow: 5px 5px 0 var(--ink);
+        padding: 14px 16px;
       }
 
       #moreMenu,
@@ -1136,6 +1232,63 @@
 
       .menu-item:last-child {
         margin-bottom: 0;
+      }
+
+      .card-actions {
+        gap: 6px;
+        align-items: flex-start;
+      }
+
+      .card-actions button {
+        padding: 4px 7px;
+        min-width: 46px;
+        font-size: 10px;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      #clearSearchBtn,
+      #settingsBtn,
+      .hidden-tags-close,
+      #webdavClose {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        transform: none !important;
+        box-shadow: 3px 3px 0 var(--ink) !important;
+      }
+
+      #clearSearchBtn:hover,
+      #settingsBtn:hover,
+      .hidden-tags-close:hover,
+      #webdavClose:hover {
+        transform: none !important;
+        box-shadow: 4px 4px 0 var(--ink) !important;
+        background: #fffdf7 !important;
+      }
+
+      #clearSearchBtn:active,
+      #settingsBtn:active,
+      .hidden-tags-close:active,
+      #webdavClose:active {
+        transform: none !important;
+        box-shadow: 2px 2px 0 var(--ink) !important;
+      }
+
+      .pin-btn {
+        background: var(--accent-lime) !important;
+      }
+
+      .edit-btn {
+        background: var(--accent-cool) !important;
+      }
+
+      .delete-btn {
+        background: var(--accent-pink) !important;
+      }
+
+      .card-meta {
+        margin-right: 2px;
       }
 
       #toast {
@@ -1172,6 +1325,89 @@
         border-radius: 8px;
         background: var(--panel);
         box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .hidden-tags-header,
+      .rename-header,
+      .webdav-modal > div:first-child,
+      #copyConfigOverlay > div > div:first-child,
+      #pasteConfigOverlay > div > div:first-child {
+        background: var(--accent-soft);
+        border-bottom: 3px solid var(--ink);
+      }
+
+      .hidden-tags-body,
+      .rename-body,
+      .webdav-modal > div:last-child,
+      #copyConfigOverlay > div > div:last-child,
+      #pasteConfigOverlay > div > div:last-child {
+        background:
+          repeating-linear-gradient(
+            -45deg,
+            rgba(16, 16, 16, 0.03) 0 14px,
+            rgba(16, 16, 16, 0) 14px 28px
+          ),
+          var(--paper);
+      }
+
+      .webdav-modal > div:last-child > div {
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        box-shadow: 5px 5px 0 var(--ink);
+        padding: 14px;
+        background: var(--panel);
+      }
+
+      .webdav-modal > div:last-child > div > div:first-child {
+        margin-bottom: 12px !important;
+      }
+
+      .webdav-modal > div:last-child > div > div:first-child,
+      .webdav-modal > div:last-child > div > div:first-child > div:first-child {
+        font-weight: 900 !important;
+        color: var(--ink) !important;
+      }
+
+      .webdav-modal > div:last-child > div > div:nth-child(2) {
+        border: 3px solid var(--ink);
+        border-radius: 8px;
+        box-shadow: 4px 4px 0 var(--ink);
+        background: #fffdf7 !important;
+      }
+
+      .webdav-modal > div:last-child > div:nth-child(1) > div:nth-child(2) {
+        background: #fff6da !important;
+      }
+
+      .webdav-modal > div:last-child > div:nth-child(2) > div:nth-child(2) {
+        background: #efffff !important;
+      }
+
+      .webdav-modal > div:last-child > div:nth-child(3) > div:nth-child(2),
+      .webdav-modal > div:last-child > div:nth-child(3) > div:nth-child(3) {
+        background: #fff7fb !important;
+      }
+
+      .hidden-tags-header h2,
+      .rename-header h2,
+      .webdav-modal h2,
+      #copyConfigOverlay h2,
+      #pasteConfigOverlay h2,
+      #modalOverlay h2 {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 5px 10px;
+        background: var(--accent-pink);
+        border: 3px solid var(--ink);
+        border-radius: 6px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .hidden-tags-actions,
+      .rename-actions,
+      #modalOverlay > div > div:last-child {
+        margin-top: 6px;
       }
 
       .hidden-tags-actions,
@@ -1213,17 +1449,403 @@
         color: var(--muted);
       }
 
+      .webdav-modal h2,
+      .hidden-tags-header h2,
+      .rename-header h2,
+      #modalOverlay h2,
+      #copyConfigOverlay h2,
+      #pasteConfigOverlay h2 {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 900;
+      }
+
+      #copyConfigText,
+      #pasteConfigText {
+        font-family: "SF Mono", "JetBrains Mono", monospace !important;
+        line-height: 1.55;
+      }
+
+      #copyConfigOverlay p,
+      #pasteConfigOverlay p {
+        font-weight: 700;
+      }
+
       .context-menu-item {
         margin-bottom: 6px;
         background: var(--panel) !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: 2px solid var(--ink) !important;
       }
 
       .context-menu-item:last-child {
         margin-bottom: 0;
       }
 
+      .context-menu-item:hover,
+      .context-menu-item:active {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
       .context-menu-item span {
         color: var(--ink);
+      }
+
+      .context-menu-item[data-action="delete"] {
+        background: #fff0ef !important;
+      }
+
+      /* Brutalist system refinement */
+      :root {
+        --nb-bg: #f3ead7;
+        --nb-surface: #fffaf1;
+        --nb-surface-strong: #fff1bd;
+        --nb-accent: #ff7a59;
+        --nb-accent-alt: #83eadb;
+        --nb-accent-soft: #ffd84d;
+        --nb-ink: #111111;
+        --nb-shadow: 4px 4px 0 var(--nb-ink);
+        --nb-shadow-strong: 6px 6px 0 var(--nb-ink);
+        --nb-radius: 8px;
+        --nb-border: 3px solid var(--nb-ink);
+      }
+
+      body {
+        background:
+          linear-gradient(180deg, #f8d64e 0 110px, var(--nb-bg) 110px 100%),
+          repeating-linear-gradient(
+            -45deg,
+            rgba(17, 17, 17, 0.035) 0 14px,
+            rgba(17, 17, 17, 0) 14px 28px
+          );
+      }
+
+      body::before {
+        opacity: 0.22;
+      }
+
+      aside,
+      .list-scroll,
+      .preview-panel,
+      .hidden-tags-modal,
+      .rename-modal,
+      .webdav-modal,
+      #modalOverlay > div,
+      #copyConfigOverlay > div,
+      #pasteConfigOverlay > div,
+      #moreMenu,
+      #contextMenu {
+        border: var(--nb-border) !important;
+        border-radius: var(--nb-radius) !important;
+        box-shadow: var(--nb-shadow-strong) !important;
+      }
+
+      aside {
+        width: 208px;
+        padding: 18px 14px;
+        background: var(--nb-surface-strong) !important;
+      }
+
+      header {
+        background: var(--nb-surface) !important;
+        border-bottom: var(--nb-border) !important;
+        box-shadow: 0 6px 0 var(--nb-ink) !important;
+      }
+
+      .logo {
+        padding: 12px 10px;
+        background: var(--nb-surface) !important;
+        border: var(--nb-border);
+        box-shadow: var(--nb-shadow);
+      }
+
+      .logo small {
+        background: var(--nb-accent-alt);
+      }
+
+      .nav-item,
+      .card,
+      #addBtn,
+      #saveBtn,
+      #previewEdit,
+      #hiddenTagsSave,
+      #renameTagSave,
+      #webdavBackup,
+      #copyConfigBtn,
+      #pasteConfigApply {
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      }
+
+      .nav-item,
+      .card {
+        background: var(--nb-surface) !important;
+      }
+
+      .nav-item.active {
+        background: var(--nb-accent) !important;
+      }
+
+      .nav-item:hover,
+      .card:hover,
+      #addBtn:hover,
+      #saveBtn:hover,
+      #previewEdit:hover,
+      #hiddenTagsSave:hover,
+      #renameTagSave:hover,
+      #webdavBackup:hover,
+      #copyConfigBtn:hover,
+      #pasteConfigApply:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--nb-shadow-strong) !important;
+      }
+
+      .nav-item:active,
+      .card:active,
+      #addBtn:active,
+      #saveBtn:active,
+      #previewEdit:active,
+      #hiddenTagsSave:active,
+      #renameTagSave:active,
+      #webdavBackup:active,
+      #copyConfigBtn:active,
+      #pasteConfigApply:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 var(--nb-ink) !important;
+      }
+
+      .card,
+      .card:nth-child(4n + 1),
+      .card:nth-child(4n + 2),
+      .card:nth-child(4n + 3),
+      .card:nth-child(4n + 4) {
+        background: var(--nb-surface) !important;
+      }
+
+      .card.active-card,
+      .card:focus {
+        background: #fff0b6 !important;
+      }
+
+      .card-tag,
+      .preview-tag,
+      .list-header > span,
+      .preview-kicker,
+      #resultCount {
+        border: 2px solid var(--nb-ink) !important;
+        border-radius: 6px !important;
+        box-shadow: 3px 3px 0 var(--nb-ink) !important;
+      }
+
+      .list-header > span {
+        background: var(--nb-accent-alt);
+      }
+
+      .preview-kicker {
+        background: var(--nb-accent-soft);
+      }
+
+      #resultCount {
+        background: var(--nb-accent) !important;
+        color: #111 !important;
+      }
+
+      .preview-panel {
+        background: #bdf0e8 !important;
+      }
+
+      .preview-body {
+        background: var(--nb-surface) !important;
+      }
+
+      .search-input,
+      .modal-input,
+      .modal-textarea,
+      .webdav-input,
+      .rename-body input,
+      #copyConfigText,
+      #pasteConfigText,
+      select {
+        border: var(--nb-border) !important;
+        border-radius: var(--nb-radius) !important;
+        background: var(--nb-surface) !important;
+        box-shadow: var(--nb-shadow) !important;
+      }
+
+      .search-input {
+        background: #fff4c5 !important;
+      }
+
+      #clearSearchBtn,
+      #settingsBtn,
+      .hidden-tags-close,
+      #webdavClose,
+      .card-actions button {
+        border: 2px solid var(--nb-ink) !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0 var(--nb-ink) !important;
+        transform: none !important;
+      }
+
+      #clearSearchBtn,
+      #settingsBtn,
+      .hidden-tags-close,
+      #webdavClose {
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        background: var(--nb-surface) !important;
+      }
+
+      #clearSearchBtn:hover,
+      #settingsBtn:hover,
+      .hidden-tags-close:hover,
+      #webdavClose:hover {
+        transform: none !important;
+        box-shadow: 3px 3px 0 var(--nb-ink) !important;
+      }
+
+      .card-actions {
+        gap: 5px;
+      }
+
+      .card-actions button {
+        min-width: 42px;
+        padding: 4px 6px;
+        font-size: 10px;
+        box-shadow: 2px 2px 0 var(--nb-ink) !important;
+      }
+
+      .card-actions button:hover,
+      .card-actions button:active {
+        transform: none !important;
+      }
+
+      .pin-btn {
+        background: #d8ff73 !important;
+      }
+
+      .edit-btn {
+        background: #bdf0e8 !important;
+      }
+
+      .delete-btn {
+        background: #ffd5e9 !important;
+      }
+
+      #addBtn,
+      #saveBtn,
+      #previewEdit,
+      #hiddenTagsSave,
+      #renameTagSave,
+      #webdavBackup,
+      #copyConfigBtn,
+      #pasteConfigApply {
+        background: var(--nb-accent-soft) !important;
+      }
+
+      #cancelBtn,
+      #hiddenTagsCancel,
+      #renameTagCancel,
+      #pasteConfigCancel,
+      #webdavRestore,
+      #webdavCopyConfig,
+      #webdavPasteConfig,
+      #webdavTest,
+      .menu-item {
+        background: var(--nb-surface) !important;
+      }
+
+      #moreMenu,
+      #contextMenu {
+        background: var(--nb-surface-strong) !important;
+      }
+
+      .menu-item,
+      .context-menu-item {
+        transform: none !important;
+      }
+
+      .menu-item:hover,
+      .menu-item:active,
+      .context-menu-item:hover,
+      .context-menu-item:active {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .context-menu-item {
+        border: 2px solid var(--nb-ink) !important;
+        box-shadow: none !important;
+        background: var(--nb-surface) !important;
+      }
+
+      .context-menu-item[data-action="delete"] {
+        background: #ffe9e4 !important;
+      }
+
+      .list-scroll::before,
+      .list-scroll::after,
+      .preview-panel::before {
+        content: none !important;
+      }
+
+      .hidden-tags-header,
+      .rename-header,
+      .webdav-modal > div:first-child,
+      #copyConfigOverlay > div > div:first-child,
+      #pasteConfigOverlay > div > div:first-child {
+        background: var(--nb-surface-strong) !important;
+      }
+
+      .hidden-tags-header h2,
+      .rename-header h2,
+      .webdav-modal h2,
+      #copyConfigOverlay h2,
+      #pasteConfigOverlay h2,
+      #modalOverlay h2 {
+        background: var(--nb-accent-alt) !important;
+      }
+
+      .webdav-modal > div:last-child > div {
+        background: var(--nb-surface) !important;
+        border: var(--nb-border) !important;
+        border-radius: var(--nb-radius) !important;
+        box-shadow: var(--nb-shadow) !important;
+      }
+
+      main {
+        min-height: 0 !important;
+      }
+
+      .content-wrap {
+        height: calc(100vh - 50px) !important;
+        min-height: 0 !important;
+      }
+
+      .list-panel,
+      .preview-panel {
+        min-height: 0 !important;
+      }
+
+      .list-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        align-content: start;
+      }
+
+      .preview-panel {
+        overflow: auto;
+      }
+
+      .webdav-modal > div:last-child > div > div:nth-child(2),
+      .webdav-modal > div:last-child > div > div:nth-child(3) {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
       }
     </style>
     <script type="module" src="./renderer.js" defer></script>
@@ -1232,7 +1854,7 @@
   <body>
     <div class="app-container">
       <aside id="sidebar">
-        <div class="logo">PromptBox</div>
+        <div class="logo">PromptBox<small>BRUTAL PROMPT DESK</small></div>
         <a href="#" class="nav-item active" data-filter="all">全部提示词</a>
         <button
           id="addTagBtn"
@@ -1370,7 +1992,7 @@
         <div class="content-wrap">
           <section class="list-panel">
             <div class="list-header" id="listHeader" style="cursor: pointer; user-select: none;">
-              <span>Library</span>
+              <span>提示词仓库</span>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span id="editModeIndicator" style="font-size: 11px; color: var(--accent); opacity: 0; transition: opacity 0.2s ease;">编辑模式</span>
                 <span id="resultCount">0</span>
@@ -1380,12 +2002,13 @@
           </section>
           <section class="preview-panel" id="previewPanel">
             <div class="preview-header">
+              <span class="preview-kicker">焦点预览</span>
               <span class="preview-tag" id="previewTag">标签</span>
               <div class="preview-title" id="previewTitle">未选择</div>
             </div>
             <div class="preview-body" id="previewBody">从左侧选择一条提示词以查看完整内容。</div>
             <div class="preview-actions">
-              <button class="accent-btn" id="previewEdit">Edit</button>
+              <button class="accent-btn" id="previewEdit">编辑当前</button>
             </div>
           </section>
         </div>
