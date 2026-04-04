@@ -627,9 +627,9 @@ function escapeHtml(value) {
 
   function clearPreview() {
     selectedIndex = null;
-    if (previewTitle) previewTitle.textContent = "选择一个提示词";
-    if (previewBody) previewBody.textContent = "在左侧选择一个卡片，这里会展示完整内容。";
-    if (previewTag) previewTag.textContent = "标签";
+    if (previewTitle) previewTitle.textContent = "提示词详情";
+    if (previewBody) previewBody.textContent = "从左侧选择一条提示词，这里会显示完整内容。";
+    if (previewTag) previewTag.textContent = "未选择";
     if (previewPanel) previewPanel.style.opacity = "0.9";
     applyPreviewTheme(null);
     if (resultCount) resultCount.textContent = "0";
@@ -789,9 +789,9 @@ function escapeHtml(value) {
         const card = document.createElement("div");
         card.className = "card";
         if (item.isPinned) {
-          card.style.border = "3px solid #101010";
-          card.style.boxShadow = "4px 4px 0 #101010";
-          card.style.backgroundColor = "#fff0b6";
+          card.style.border = "1px solid #eadfce";
+          card.style.boxShadow = "0 14px 30px rgba(15, 23, 42, 0.08)";
+          card.style.backgroundColor = "#fffaf2";
           card.classList.add("pinned-card");
         }
 
@@ -808,8 +808,8 @@ function escapeHtml(value) {
             return;
           }
 
-          card.style.boxShadow = "0 0 0 3px rgba(16, 16, 16, 0.28)";
-          setTimeout(() => (card.style.boxShadow = item.isPinned ? "4px 4px 0 #101010" : ""), 500);
+          card.style.boxShadow = "0 0 0 3px rgba(217, 119, 87, 0.12), 0 16px 34px rgba(15, 23, 42, 0.1)";
+          setTimeout(() => (card.style.boxShadow = item.isPinned ? "0 14px 30px rgba(15, 23, 42, 0.08)" : ""), 500);
 
           if (result.pasted) {
             showToast("已粘贴到当前输入位置");
@@ -819,9 +819,9 @@ function escapeHtml(value) {
             showToast("已复制，未自动粘贴");
           }
 
-          card.style.backgroundColor = "#ffd84d";
+          card.style.backgroundColor = "#f8efe2";
           setTimeout(() => {
-            card.style.backgroundColor = item.isPinned ? "#fff0b6" : "";
+            card.style.backgroundColor = item.isPinned ? "#fffaf2" : "";
           }, 200);
 
           if (!result.pasted) {
@@ -852,12 +852,12 @@ function escapeHtml(value) {
         };
 
         card.innerHTML = `
-          <div class="card-header" style="display: flex; align-items: flex-start; gap: 12px;">
-            <div class="card-content" style="flex: 1; min-width: 0;">
+          <div class="card-header">
+            <div class="card-content">
               <div class="card-title">${escapeHtml(item.name)}</div>
               <div class="card-body">${escapeHtml(item.content)}</div>
             </div>
-            <div class="card-actions" style="flex-shrink: 0;">
+            <div class="card-actions">
               <span class="card-meta">
                 <span class="card-tag">${escapeHtml(normalizedTag || "默认")}</span>
               </span>
