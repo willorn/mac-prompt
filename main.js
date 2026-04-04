@@ -1,13 +1,16 @@
 import {
   app,
   BrowserWindow,
+  clipboard,
   dialog,
   globalShortcut,
   ipcMain,
   Menu,
   screen,
+  systemPreferences,
   Tray,
 } from "electron";
+import { execFile } from "child_process";
 import Store from "electron-store";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -177,6 +180,65 @@ function hideMainWindow() {
     },
     false,
   );
+}
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function runOsascript(lines) {
+  return new Promise((resolve, reject) => {
+    const args = lines.flatMap((line) => ["-e", line]);
+    execFile("osascript", args, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(stderr?.trim() || error.message));
+        return;
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+async function pasteClipboardToFrontmostApp() {
+  if (process.platform !== "darwin") {
+    return false;
+  }
+  await delay(180);
+  await runOsascript([
+    'tell application "System Events"',
+    'keystroke "v" using command down',
+    "end tell",
+  ]);
+  return true;
+}
+
+function ensureAccessibilityPermission() {
+  if (process.platform !== "darwin") {
+    return true;
+  }
+  if (systemPreferences.isTrustedAccessibilityClient(false)) {
+    return true;
+  }
+
+  systemPreferences.isTrustedAccessibilityClient(true);
+  const targetName = app.isPackaged ? app.getName() : "Electron";
+  const targetPath = process.execPath;
+  const detail = app.isPackaged
+    ? `请打开“系统设置 -> 隐私与安全性 -> 辅助功能”，启用“${targetName}”。\n\n授权后回到应用重试；如果仍然无效，重启应用后再试。`
+    : `当前是开发模式，macOS 里通常需要启用的是“${targetName}”，不是“${app.getName()}”。\n\n` +
+      `可执行文件路径：${targetPath}\n\n` +
+      "请打开“系统设置 -> 隐私与安全性 -> 辅助功能”，确认列表里已勾选“Electron”；如果列表里没有，就手动把上面的 Electron.app 加进去。授权后重试；如果仍然无效，重启应用后再试。";
+  dialog.showMessageBox({
+    type: "warning",
+    title: "需要辅助功能权限",
+    message: "自动粘贴需要 macOS 辅助功能权限。",
+    detail,
+    buttons: ["知道了"],
+    defaultId: 0,
+  });
+  return false;
 }
 
 function toggleMainWindow() {
@@ -352,6 +414,36 @@ ipcMain.handle("minimize-window", () => {
   if (!mainWindow) return false;
   hideMainWindow();
   return true;
+});
+
+ipcMain.handle("copy-paste-prompt", async (_event, text) => {
+  if (typeof text !== "string" || !text.length) {
+    throw new Error("text required");
+  }
+  clipboard.writeText(text);
+
+  if (!ensureAccessibilityPermission()) {
+    hideMainWindow();
+    return {
+      copied: true,
+      pasted: false,
+      requiresAccessibilityPermission: true,
+    };
+  }
+
+  hideMainWindow();
+
+  try {
+    const pasted = await pasteClipboardToFrontmostApp();
+    return { copied: true, pasted };
+  } catch (error) {
+    console.error("Paste after hide failed", error);
+    return {
+      copied: true,
+      pasted: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 });
 
 ipcMain.handle("export-prompts", async (_event, content) => {

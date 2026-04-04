@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   minimizeWindow: () => ipcRenderer.invoke("minimize-window"),
+  copyPastePrompt: (text) => ipcRenderer.invoke("copy-paste-prompt", text),
   exportPrompts: (content) => ipcRenderer.invoke("export-prompts", content),
   importPrompts: () => ipcRenderer.invoke("import-prompts"),
   getPrompts: () => ipcRenderer.invoke("get-prompts"),

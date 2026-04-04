@@ -69,6 +69,20 @@ async function copyText(text) {
   }
 }
 
+async function copyPromptForUse(text) {
+  try {
+    assertElectron();
+    if (electronAPI?.copyPastePrompt) {
+      return await electronAPI.copyPastePrompt(text);
+    }
+  } catch (err) {
+    console.error("主进程复制粘贴失败，回退为仅复制", err);
+  }
+
+  const copied = await copyText(text);
+  return { copied, pasted: false };
+}
+
   document.addEventListener("DOMContentLoaded", () => {
   const navItemsContainer = document.getElementById("sidebar");
   const cardGrid = document.getElementById("cardGrid");
@@ -803,25 +817,33 @@ async function copyText(text) {
         if (cardContent) {
           cardContent.onclick = async (e) => {
             e.stopPropagation();
-            // 点击卡片复制内容
-            const copied = await copyText(item.content);
-          if (!copied) {
-            console.error("复制失败");
-            showToast("复制失败，请手动复制");
-            return;
-          }
+            const result = await copyPromptForUse(item.content);
+            if (!result?.copied) {
+              console.error("复制失败");
+              showToast("复制失败，请手动复制");
+              return;
+            }
 
-          card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
-          setTimeout(() => (card.style.boxShadow = ""), 500);
-          showToast("已复制，窗口已隐藏");
+            card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
+            setTimeout(() => (card.style.boxShadow = ""), 500);
 
-          card.style.backgroundColor = "rgba(10, 132, 255, 0.12)";
-          setTimeout(() => {
-            card.style.backgroundColor = item.isPinned ? "rgba(10, 132, 255, 0.08)" : "white";
-          }, 200);
+            if (result.pasted) {
+              showToast("已粘贴到当前输入位置");
+            } else if (result.requiresAccessibilityPermission) {
+              showToast("已复制，请先授予辅助功能权限");
+            } else {
+              showToast("已复制，未自动粘贴");
+            }
 
-          closeCurrentWindowSilently();
-          selectCard(item.originalIndex);
+            card.style.backgroundColor = "rgba(10, 132, 255, 0.12)";
+            setTimeout(() => {
+              card.style.backgroundColor = item.isPinned ? "rgba(10, 132, 255, 0.08)" : "white";
+            }, 200);
+
+            if (!result.pasted) {
+              closeCurrentWindowSilently();
+            }
+            selectCard(item.originalIndex);
           };
         }
         cardGrid.appendChild(card);
