@@ -126,7 +126,11 @@ function escapeHtml(value) {
   const previewTitle = document.getElementById("previewTitle");
   const previewBody = document.getElementById("previewBody");
   const previewTag = document.getElementById("previewTag");
+  const previewMode = document.getElementById("previewMode");
+  const previewUse = document.getElementById("previewUse");
+  const previewPin = document.getElementById("previewPin");
   const previewEdit = document.getElementById("previewEdit");
+  const previewDelete = document.getElementById("previewDelete");
   const resultCount = document.getElementById("resultCount");
 
   const tagInput = document.getElementById("newTag");
@@ -630,6 +634,14 @@ function escapeHtml(value) {
     if (previewTitle) previewTitle.textContent = "提示词详情";
     if (previewBody) previewBody.textContent = "从左侧选择一条提示词，这里会显示完整内容。";
     if (previewTag) previewTag.textContent = "未选择";
+    if (previewMode) previewMode.textContent = "请选择一条提示词";
+    if (previewUse) previewUse.disabled = true;
+    if (previewPin) {
+      previewPin.textContent = "置顶";
+      previewPin.disabled = true;
+    }
+    if (previewEdit) previewEdit.disabled = true;
+    if (previewDelete) previewDelete.disabled = true;
     if (previewPanel) previewPanel.style.opacity = "0.9";
     applyPreviewTheme(null);
     if (resultCount) resultCount.textContent = "0";
@@ -640,6 +652,16 @@ function escapeHtml(value) {
     if (previewTitle) previewTitle.textContent = item.name || "未命名";
     if (previewBody) previewBody.textContent = item.content || "";
     if (previewTag) previewTag.textContent = normalizeTag(item.tag) || "默认";
+    if (previewMode) {
+      previewMode.textContent = "点击卡片内容即可直接使用，也可按回车执行";
+    }
+    if (previewUse) previewUse.disabled = false;
+    if (previewPin) {
+      previewPin.textContent = item.isPinned ? "取消置顶" : "置顶";
+      previewPin.disabled = false;
+    }
+    if (previewEdit) previewEdit.disabled = false;
+    if (previewDelete) previewDelete.disabled = false;
     if (previewPanel) previewPanel.style.opacity = "1";
     applyPreviewTheme(item);
   }
@@ -652,6 +674,40 @@ function escapeHtml(value) {
     });
     const item = allPrompts[originalIndex];
     updatePreview(item);
+  }
+
+  async function usePromptAtIndex(index, card = null) {
+    const item = allPrompts[index];
+    if (!item) return null;
+    const result = await copyPromptForUse(item.content);
+    if (!result?.copied) {
+      console.error("复制失败");
+      showToast("复制失败，请手动复制");
+      return result;
+    }
+
+    if (card) {
+      card.style.boxShadow = "0 0 0 3px rgba(79, 140, 255, 0.14), 0 16px 34px rgba(15, 23, 42, 0.1)";
+      setTimeout(() => (card.style.boxShadow = item.isPinned ? "0 14px 30px rgba(15, 23, 42, 0.08)" : ""), 500);
+      card.style.backgroundColor = "#edf4ff";
+      setTimeout(() => {
+        card.style.backgroundColor = item.isPinned ? "#f6faff" : "";
+      }, 200);
+    }
+
+    if (result.pasted) {
+      showToast("已粘贴到当前输入位置");
+    } else if (result.requiresAccessibilityPermission) {
+      showToast("已复制，请先授予辅助功能权限");
+    } else {
+      showToast("已复制，未自动粘贴");
+    }
+
+    if (!result.pasted) {
+      closeCurrentWindowSilently();
+    }
+    selectCard(index);
+    return result;
   }
 
   function updateSidebarAndDropdown() {
@@ -773,6 +829,29 @@ function escapeHtml(value) {
     const displayList = [...allPrompts]
       .map((item, originalIndex) => ({ ...item, originalIndex }))
       .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
+    const pinnedItems = [];
+    const regularItems = [];
+
+    const createSection = (title, note) => {
+      const section = document.createElement("section");
+      section.className = "card-section";
+      const header = document.createElement("div");
+      header.className = "card-section-header";
+      const titleEl = document.createElement("div");
+      titleEl.className = "card-section-title";
+      titleEl.textContent = title;
+      const noteEl = document.createElement("div");
+      noteEl.className = "card-section-note";
+      noteEl.textContent = note;
+      header.appendChild(titleEl);
+      header.appendChild(noteEl);
+      const list = document.createElement("div");
+      list.className = "card-section-list";
+      section.appendChild(header);
+      section.appendChild(list);
+      cardGrid.appendChild(section);
+      return list;
+    };
 
     displayList.forEach((item) => {
       const matchesSearch =
@@ -788,10 +867,11 @@ function escapeHtml(value) {
         visibleCount += 1;
         const card = document.createElement("div");
         card.className = "card";
+        const interactionHint = "点击即用";
         if (item.isPinned) {
-          card.style.border = "1px solid #eadfce";
+          card.style.border = "1px solid #d4e2f6";
           card.style.boxShadow = "0 14px 30px rgba(15, 23, 42, 0.08)";
-          card.style.backgroundColor = "#fffaf2";
+          card.style.backgroundColor = "#f6faff";
           card.classList.add("pinned-card");
         }
 
@@ -799,36 +879,12 @@ function escapeHtml(value) {
         card.dataset.originalIndex = item.originalIndex;
         card.addEventListener("mouseenter", () => selectCard(item.originalIndex, true));
         card.addEventListener("focus", () => selectCard(item.originalIndex, true));
-
-        const handleUsePrompt = async () => {
-          const result = await copyPromptForUse(item.content);
-          if (!result?.copied) {
-            console.error("复制失败");
-            showToast("复制失败，请手动复制");
-            return;
-          }
-
-          card.style.boxShadow = "0 0 0 3px rgba(217, 119, 87, 0.12), 0 16px 34px rgba(15, 23, 42, 0.1)";
-          setTimeout(() => (card.style.boxShadow = item.isPinned ? "0 14px 30px rgba(15, 23, 42, 0.08)" : ""), 500);
-
-          if (result.pasted) {
-            showToast("已粘贴到当前输入位置");
-          } else if (result.requiresAccessibilityPermission) {
-            showToast("已复制，请先授予辅助功能权限");
-          } else {
-            showToast("已复制，未自动粘贴");
-          }
-
-          card.style.backgroundColor = "#f8efe2";
-          setTimeout(() => {
-            card.style.backgroundColor = item.isPinned ? "#fffaf2" : "";
-          }, 200);
-
-          if (!result.pasted) {
-            closeCurrentWindowSilently();
-          }
+        card.addEventListener("click", () => {
           selectCard(item.originalIndex);
-        };
+          card.focus();
+        });
+
+        const handleUsePrompt = async () => usePromptAtIndex(item.originalIndex, card);
 
         card.onkeydown = (e) => {
           const cards = document.querySelectorAll(".card");
@@ -860,32 +916,44 @@ function escapeHtml(value) {
             <div class="card-actions">
               <span class="card-meta">
                 <span class="card-tag">${escapeHtml(normalizedTag || "默认")}</span>
+                <span class="card-hint">${interactionHint}</span>
               </span>
-              <button class="pin-btn" data-index="${item.originalIndex}" style="color: #101010;">置顶</button>
-              <button class="edit-btn" data-index="${item.originalIndex}">编辑</button>
-              <button class="delete-btn" data-index="${item.originalIndex}">删除</button>
             </div>
           </div>
         `;
 
-        // 右键菜单
         card.oncontextmenu = (e) => {
           e.preventDefault();
           showContextMenu(e, item);
         };
 
-        // 只有内容区域点击才复制
         const cardContent = card.querySelector('.card-content');
         if (cardContent) {
           cardContent.onclick = async (e) => {
             e.stopPropagation();
+            selectCard(item.originalIndex);
+            card.focus();
             await handleUsePrompt();
-          };
+          }
         }
-        cardGrid.appendChild(card);
+        if (item.isPinned) {
+          pinnedItems.push(card);
+        } else {
+          regularItems.push(card);
+        }
         visibleIndices.push(item.originalIndex);
       }
     });
+
+    if (pinnedItems.length > 0) {
+      const pinnedList = createSection("置顶快捷使用", "点击内容直接执行");
+      pinnedItems.forEach((card) => pinnedList.appendChild(card));
+    }
+
+    if (regularItems.length > 0) {
+      const regularList = createSection("全部结果", "点击内容直接执行，回车也可使用");
+      regularItems.forEach((card) => regularList.appendChild(card));
+    }
 
     if (resultCount) {
       resultCount.textContent = String(visibleCount);
@@ -896,36 +964,6 @@ function escapeHtml(value) {
       selectCard(visibleIndices[0]);
     }
 
-    attachDynamicEvents();
-  }
-
-  function attachDynamicEvents() {
-    document.querySelectorAll(".delete-btn").forEach((btn) => {
-      btn.onclick = async (e) => {
-        e.stopPropagation();
-        if (confirm("确定删除此提示词吗？")) {
-          allPrompts.splice(btn.dataset.index, 1);
-          await saveData();
-        }
-      };
-    });
-
-    document.querySelectorAll(".pin-btn").forEach((btn) => {
-      btn.onclick = async (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.index);
-        allPrompts[idx].isPinned = !allPrompts[idx].isPinned;
-        await saveData();
-      };
-    });
-
-    document.querySelectorAll(".edit-btn").forEach((btn) => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.index);
-        openEditModal(idx);
-      };
-    });
   }
 
   searchInput.addEventListener("input", () => {
@@ -1069,6 +1107,34 @@ function escapeHtml(value) {
     previewEdit.onclick = () => {
       if (selectedIndex === null) return;
       openEditModal(selectedIndex);
+    };
+  }
+
+  if (previewUse) {
+    previewUse.onclick = async () => {
+      if (selectedIndex === null) return;
+      await usePromptAtIndex(selectedIndex);
+    };
+  }
+
+  if (previewPin) {
+    previewPin.onclick = async () => {
+      if (selectedIndex === null || !allPrompts[selectedIndex]) return;
+      allPrompts[selectedIndex].isPinned = !allPrompts[selectedIndex].isPinned;
+      await saveData();
+      showToast(allPrompts[selectedIndex]?.isPinned ? "已置顶" : "已取消置顶");
+    };
+  }
+
+  if (previewDelete) {
+    previewDelete.onclick = async () => {
+      if (selectedIndex === null) return;
+      const item = allPrompts[selectedIndex];
+      if (!item) return;
+      if (!confirm(`确定删除 "${item.name}" 吗？`)) return;
+      allPrompts.splice(selectedIndex, 1);
+      await saveData();
+      showToast("已删除");
     };
   }
 
