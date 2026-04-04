@@ -30,14 +30,36 @@ function assertElectron() {
   }
 }
 
+function normalizePrompt(prompt) {
+  if (!prompt || typeof prompt !== "object") return null;
+  const name = String(prompt.name ?? "").trim();
+  const content = String(prompt.content ?? "").trim();
+  if (!name || !content) return null;
+  return {
+    name,
+    tag: typeof prompt.tag === "string" ? prompt.tag.trim() : "",
+    content,
+    isPinned: prompt.isPinned === true,
+  };
+}
+
+function sanitizePromptList(list) {
+  if (!Array.isArray(list)) return [];
+  return list.map((item) => normalizePrompt(item)).filter(Boolean);
+}
+
 async function loadPrompts() {
   try {
     assertElectron();
     const stored = await electronAPI.getPrompts();
-    if (!Array.isArray(stored) || stored.length === 0) {
+    if (!Array.isArray(stored)) {
       return DEFAULT_PROMPTS.slice();
     }
-    return stored;
+    const sanitized = sanitizePromptList(stored);
+    if (sanitized.length === 0 && stored.length > 0) {
+      return DEFAULT_PROMPTS.slice();
+    }
+    return sanitized;
   } catch {
     return DEFAULT_PROMPTS.slice();
   }
@@ -45,7 +67,7 @@ async function loadPrompts() {
 
 async function persistPrompts(list) {
   assertElectron();
-  await electronAPI.setPrompts(list);
+  await electronAPI.setPrompts(sanitizePromptList(list));
 }
 
 async function copyText(text) {
@@ -81,6 +103,15 @@ async function copyPromptForUse(text) {
 
   const copied = await copyText(text);
   return { copied, pasted: false };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -635,7 +666,7 @@ async function copyPromptForUse(text) {
         .map(
           (tag) => `
                 <div class="tag-option" style="padding: 10px 12px; cursor: pointer; font-size: 14px; color: #475569; transition: background 0.2s;">
-                    ${tag}
+                    ${escapeHtml(tag)}
                 </div>
             `,
         )
@@ -723,6 +754,7 @@ async function copyPromptForUse(text) {
   }
 
   async function saveData() {
+    allPrompts = sanitizePromptList(allPrompts);
     try {
       await persistPrompts(allPrompts);
     } catch (err) {
@@ -758,9 +790,9 @@ async function copyPromptForUse(text) {
         const card = document.createElement("div");
         card.className = "card";
         if (item.isPinned) {
-          card.style.border = "2px solid #0a84ff";
-          card.style.boxShadow = "0 4px 12px rgba(10, 132, 255, 0.18)";
-          card.style.backgroundColor = "#f4f7ff";
+          card.style.border = "3px solid #101010";
+          card.style.boxShadow = "4px 4px 0 #101010";
+          card.style.backgroundColor = "#fff0b6";
           card.classList.add("pinned-card");
         }
 
@@ -769,19 +801,50 @@ async function copyPromptForUse(text) {
         card.addEventListener("mouseenter", () => selectCard(item.originalIndex, true));
         card.addEventListener("focus", () => selectCard(item.originalIndex, true));
 
+        const handleUsePrompt = async () => {
+          const result = await copyPromptForUse(item.content);
+          if (!result?.copied) {
+            console.error("复制失败");
+            showToast("复制失败，请手动复制");
+            return;
+          }
+
+          card.style.boxShadow = "0 0 0 3px rgba(16, 16, 16, 0.28)";
+          setTimeout(() => (card.style.boxShadow = item.isPinned ? "4px 4px 0 #101010" : ""), 500);
+
+          if (result.pasted) {
+            showToast("已粘贴到当前输入位置");
+          } else if (result.requiresAccessibilityPermission) {
+            showToast("已复制，请先授予辅助功能权限");
+          } else {
+            showToast("已复制，未自动粘贴");
+          }
+
+          card.style.backgroundColor = "#ffd84d";
+          setTimeout(() => {
+            card.style.backgroundColor = item.isPinned ? "#fff0b6" : "";
+          }, 200);
+
+          if (!result.pasted) {
+            closeCurrentWindowSilently();
+          }
+          selectCard(item.originalIndex);
+        };
+
         card.onkeydown = (e) => {
           const cards = document.querySelectorAll(".card");
           const currentIndex = Array.from(cards).indexOf(card);
 
           if (e.key === "Enter") {
+            e.preventDefault();
             selectCard(item.originalIndex);
-            card.click();
-          } else if (e.key === "ArrowRight" || e.key === "Tab") {
+            handleUsePrompt();
+          } else if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "Tab") {
             if (currentIndex < cards.length - 1) {
               cards[currentIndex + 1].focus();
               e.preventDefault();
             }
-          } else if (e.key === "ArrowLeft") {
+          } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
             if (currentIndex > 0) {
               cards[currentIndex - 1].focus();
               e.preventDefault();
@@ -792,12 +855,12 @@ async function copyPromptForUse(text) {
         card.innerHTML = `
           <div class="card-header" style="display: flex; align-items: flex-start; gap: 12px;">
             <div class="card-content" style="flex: 1; min-width: 0;">
-              <div class="card-title">${item.name}</div>
-              <div class="card-body">${item.content}</div>
+              <div class="card-title">${escapeHtml(item.name)}</div>
+              <div class="card-body">${escapeHtml(item.content)}</div>
             </div>
             <div class="card-actions" style="flex-shrink: 0;">
               <span class="card-meta">
-                <span class="card-tag">${normalizedTag || "默认"}</span>
+                <span class="card-tag">${escapeHtml(normalizedTag || "默认")}</span>
               </span>
               <button class="pin-btn" data-index="${item.originalIndex}" style="color: #101010;">置顶</button>
               <button class="edit-btn" data-index="${item.originalIndex}">编辑</button>
@@ -817,33 +880,7 @@ async function copyPromptForUse(text) {
         if (cardContent) {
           cardContent.onclick = async (e) => {
             e.stopPropagation();
-            const result = await copyPromptForUse(item.content);
-            if (!result?.copied) {
-              console.error("复制失败");
-              showToast("复制失败，请手动复制");
-              return;
-            }
-
-            card.style.boxShadow = "0 0 0 3px rgba(10, 132, 255, 0.2)";
-            setTimeout(() => (card.style.boxShadow = ""), 500);
-
-            if (result.pasted) {
-              showToast("已粘贴到当前输入位置");
-            } else if (result.requiresAccessibilityPermission) {
-              showToast("已复制，请先授予辅助功能权限");
-            } else {
-              showToast("已复制，未自动粘贴");
-            }
-
-            card.style.backgroundColor = "rgba(10, 132, 255, 0.12)";
-            setTimeout(() => {
-              card.style.backgroundColor = item.isPinned ? "rgba(10, 132, 255, 0.08)" : "white";
-            }, 200);
-
-            if (!result.pasted) {
-              closeCurrentWindowSilently();
-            }
-            selectCard(item.originalIndex);
+            await handleUsePrompt();
           };
         }
         cardGrid.appendChild(card);
@@ -1019,11 +1056,17 @@ async function copyPromptForUse(text) {
       const result = await electronAPI.importPrompts();
       if (result?.canceled) return;
       const parsed = JSON.parse(result.raw);
-      if (!Array.isArray(parsed)) {
-        alert("文件格式错误：必须是数组");
+      const prompts = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.prompts) ? parsed.prompts : null;
+      if (!prompts) {
+        alert("文件格式错误：必须是提示词数组，或包含 prompts 数组的备份文件");
         return;
       }
-      allPrompts = parsed;
+      const importedPrompts = sanitizePromptList(prompts);
+      if (prompts.length > 0 && importedPrompts.length === 0) {
+        alert("导入失败：文件中的提示词格式无效");
+        return;
+      }
+      allPrompts = importedPrompts;
       selectedIndex = null;
       await saveData();
       showToast("导入成功");
