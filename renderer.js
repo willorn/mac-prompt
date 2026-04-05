@@ -121,6 +121,7 @@ function escapeHtml(value) {
   const modal = document.getElementById("modalOverlay");
   const modalTitle = modal.querySelector("h2");
   const settingsBtn = document.getElementById("settingsBtn");
+  const listHeaderTitle = document.getElementById("listHeaderTitle");
   const modeUseBtn = document.getElementById("modeUseBtn");
   const modeManageBtn = document.getElementById("modeManageBtn");
   const editModeIndicator = document.getElementById("editModeIndicator");
@@ -130,6 +131,8 @@ function escapeHtml(value) {
   const previewBody = document.getElementById("previewBody");
   const previewTag = document.getElementById("previewTag");
   const previewMode = document.getElementById("previewMode");
+  const previewHelperTitle = document.getElementById("previewHelperTitle");
+  const previewHelperText = document.getElementById("previewHelperText");
   const previewUse = document.getElementById("previewUse");
   const previewPin = document.getElementById("previewPin");
   const previewEdit = document.getElementById("previewEdit");
@@ -146,6 +149,7 @@ function escapeHtml(value) {
   const menuExport = document.getElementById("menuExport");
   const menuWebdav = document.getElementById("menuWebdav");
   const menuHiddenTags = document.getElementById("menuHiddenTags");
+  const menuPermissions = document.getElementById("menuPermissions");
   const moreMenu = document.getElementById("moreMenu");
   const webdavOverlay = document.getElementById("webdavOverlay");
   const webdavUrl = document.getElementById("webdavUrl");
@@ -219,6 +223,15 @@ function escapeHtml(value) {
     document.body.dataset.appMode = appMode;
     if (modeUseBtn) modeUseBtn.classList.toggle("active", appMode === "use");
     if (modeManageBtn) modeManageBtn.classList.toggle("active", appMode === "manage");
+    if (searchInput) {
+      searchInput.placeholder = appMode === "manage" ? "搜索并整理提示词" : "搜索并立即使用";
+    }
+    if (settingsBtn) {
+      settingsBtn.title = appMode === "manage" ? "系统与整理" : "系统";
+    }
+    if (listHeaderTitle) {
+      listHeaderTitle.textContent = appMode === "manage" ? "整理提示词" : "快速调用";
+    }
     if (editModeIndicator) {
       editModeIndicator.textContent = appMode === "manage" ? "管理模式" : "使用模式";
       editModeIndicator.style.color = appMode === "manage" ? "var(--accent)" : "var(--muted)";
@@ -232,6 +245,12 @@ function escapeHtml(value) {
     appMode = mode === "manage" ? "manage" : "use";
     persistAppMode(appMode);
     applyAppMode();
+    renderAll();
+    if (selectedIndex !== null && allPrompts[selectedIndex]) {
+      updatePreview(allPrompts[selectedIndex]);
+    } else {
+      clearPreview();
+    }
   }
 
   function sanitizeTagList(list) {
@@ -670,10 +689,27 @@ function escapeHtml(value) {
 
   function clearPreview() {
     selectedIndex = null;
-    if (previewTitle) previewTitle.textContent = "提示词详情";
-    if (previewBody) previewBody.textContent = "从左侧选择一条提示词，这里会显示完整内容。";
+    if (previewTitle) previewTitle.textContent = appMode === "manage" ? "整理当前提示词" : "提示词详情";
+    if (previewBody) {
+      previewBody.textContent =
+        appMode === "manage"
+          ? "从左侧选择一条提示词，然后在右侧进行置顶、编辑或删除。"
+          : "从左侧选择一条提示词，这里会显示完整内容。";
+    }
     if (previewTag) previewTag.textContent = "未选择";
-    if (previewMode) previewMode.textContent = "请选择一条提示词";
+    if (previewMode) {
+      previewMode.textContent =
+        appMode === "manage" ? "请选择要整理的提示词" : "请选择一条提示词";
+    }
+    if (previewHelperTitle) {
+      previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
+    }
+    if (previewHelperText) {
+      previewHelperText.textContent =
+        appMode === "manage"
+          ? "管理模式下点击列表只会选中，不会直接执行；请在右侧完成置顶、编辑或删除。"
+          : "使用模式下点击卡片内容会立刻尝试复制并粘贴到当前输入位置。";
+    }
     if (previewUse) previewUse.disabled = true;
     if (previewPin) {
       previewPin.textContent = "置顶";
@@ -692,7 +728,19 @@ function escapeHtml(value) {
     if (previewBody) previewBody.textContent = item.content || "";
     if (previewTag) previewTag.textContent = normalizeTag(item.tag) || "默认";
     if (previewMode) {
-      previewMode.textContent = "点击卡片内容即可直接使用，也可按回车执行";
+      previewMode.textContent =
+        appMode === "manage"
+          ? "当前为管理模式：点击卡片只选中，不会直接执行"
+          : "点击卡片内容即可直接使用，也可按回车执行";
+    }
+    if (previewHelperTitle) {
+      previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
+    }
+    if (previewHelperText) {
+      previewHelperText.textContent =
+        appMode === "manage"
+          ? `你正在整理「${item.name || "未命名"}」，可在右侧完成置顶、编辑或删除。`
+          : `你可以直接点击左侧卡片内容，或在这里确认内容后点击“立即使用”。`;
     }
     if (previewUse) previewUse.disabled = false;
     if (previewPin) {
@@ -906,7 +954,7 @@ function escapeHtml(value) {
         visibleCount += 1;
         const card = document.createElement("div");
         card.className = "card";
-        const interactionHint = "点击即用";
+        const interactionHint = appMode === "manage" ? "点击查看" : "点击即用";
         if (item.isPinned) {
           card.style.border = "1px solid #d4e2f6";
           card.style.boxShadow = "0 14px 30px rgba(15, 23, 42, 0.08)";
@@ -932,7 +980,13 @@ function escapeHtml(value) {
           if (e.key === "Enter") {
             e.preventDefault();
             selectCard(item.originalIndex);
-            handleUsePrompt();
+            if (appMode === "manage") {
+              if (previewUse && !previewUse.disabled) {
+                previewUse.focus();
+              }
+            } else {
+              handleUsePrompt();
+            }
           } else if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "Tab") {
             if (currentIndex < cards.length - 1) {
               cards[currentIndex + 1].focus();
@@ -972,7 +1026,9 @@ function escapeHtml(value) {
             e.stopPropagation();
             selectCard(item.originalIndex);
             card.focus();
-            await handleUsePrompt();
+            if (appMode !== "manage") {
+              await handleUsePrompt();
+            }
           }
         }
         if (item.isPinned) {
@@ -985,12 +1041,18 @@ function escapeHtml(value) {
     });
 
     if (pinnedItems.length > 0) {
-      const pinnedList = createSection("置顶快捷使用", "点击内容直接执行");
+      const pinnedList = createSection(
+        "置顶快捷使用",
+        appMode === "manage" ? "管理模式下仅选中，避免误触执行" : "点击内容直接执行",
+      );
       pinnedItems.forEach((card) => pinnedList.appendChild(card));
     }
 
     if (regularItems.length > 0) {
-      const regularList = createSection("全部结果", "点击内容直接执行，回车也可使用");
+      const regularList = createSection(
+        "全部结果",
+        appMode === "manage" ? "点击查看详情，右侧进行管理" : "点击内容直接执行，回车也可使用",
+      );
       regularItems.forEach((card) => regularList.appendChild(card));
     }
 
@@ -1087,6 +1149,25 @@ function escapeHtml(value) {
   if (menuHiddenTags) {
     menuHiddenTags.onclick = () => {
       openHiddenTagsModal();
+      if (moreMenu) moreMenu.style.display = "none";
+    };
+  }
+
+  if (menuPermissions) {
+    menuPermissions.onclick = () => {
+      alert(
+        [
+          "权限说明",
+          "",
+          "1. 自动粘贴在 macOS 上通常需要“辅助功能”权限。",
+          "2. 全局快捷键 Alt+E 在部分机器上也可能依赖该权限。",
+          "3. 建议优先使用打包版 PromptBox.app 进行测试。",
+          "",
+          "路径：系统设置 → 隐私与安全性 → 辅助功能",
+          "",
+          "如果授权后仍无效，请完全退出应用后重新打开再试。",
+        ].join("\n"),
+      );
       if (moreMenu) moreMenu.style.display = "none";
     };
   }

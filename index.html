@@ -1965,6 +1965,28 @@
         flex-shrink: 0;
       }
 
+      .preview-helper {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 14px;
+        border: 1px dashed #cfe0f6;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .preview-helper-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--nb-ink);
+      }
+
+      .preview-helper-text {
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--nb-text-muted);
+      }
+
       .preview-title {
         font-size: 22px;
         line-height: 1.15;
@@ -2079,6 +2101,10 @@
 
       body[data-app-mode="use"] #addBtn,
       body[data-app-mode="use"] .manage-only {
+        display: none !important;
+      }
+
+      body[data-app-mode="manage"] .use-only {
         display: none !important;
       }
 
@@ -2394,7 +2420,7 @@
           </div>
           <button
             id="settingsBtn"
-            title="桌面版提示"
+            title="系统"
             style="
               width: 36px;
               height: 36px;
@@ -2429,19 +2455,21 @@
             z-index: 200;
             backdrop-filter: blur(18px);
           ">
-            <button class="menu-item" id="menuImport">导入</button>
-            <button class="menu-item" id="menuExport">导出</button>
+            <div style="padding: 6px 10px 4px; font-size: 10px; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase;">数据与系统</div>
+            <button class="menu-item" id="menuImport">导入数据</button>
+            <button class="menu-item" id="menuExport">导出数据</button>
+            <button class="menu-item" id="menuWebdav">同步与备份</button>
+            <button class="menu-item" id="menuPermissions">权限说明</button>
             <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
-            <button class="menu-item" id="menuHiddenTags">隐藏分类设置</button>
-            <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
-            <button class="menu-item" id="menuWebdav">WebDAV 同步</button>
+            <div class="manage-only" style="padding: 6px 10px 4px; font-size: 10px; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase;">整理</div>
+            <button class="menu-item manage-only" id="menuHiddenTags">隐藏分类设置</button>
           </div>
         </header>
 
         <div class="content-wrap">
           <section class="list-panel">
             <div class="list-header" id="listHeader" style="cursor: pointer; user-select: none;">
-              <span>提示词仓库</span>
+              <span id="listHeaderTitle">快速调用</span>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span id="editModeIndicator" style="font-size: 11px; color: var(--accent); opacity: 0; transition: opacity 0.2s ease;">编辑模式</span>
                 <span id="resultCount">0</span>
@@ -2457,7 +2485,7 @@
                   <span class="preview-mode" id="previewMode">请选择一条提示词</span>
                 </div>
                 <div class="preview-actions-inline">
-                  <button class="accent-btn" id="previewUse">立即使用</button>
+                  <button class="accent-btn use-only" id="previewUse">立即使用</button>
                   <button class="ghost-btn manage-only" id="previewPin">置顶</button>
                   <button class="ghost-btn manage-only" id="previewEdit">编辑</button>
                   <button class="ghost-btn danger-btn manage-only" id="previewDelete">删除</button>
@@ -2466,6 +2494,10 @@
               <div class="preview-title" id="previewTitle">未选择</div>
             </div>
             <div class="preview-body" id="previewBody">从左侧选择一条提示词以查看完整内容。</div>
+            <div class="preview-helper">
+              <div class="preview-helper-title" id="previewHelperTitle">使用提示</div>
+              <div class="preview-helper-text" id="previewHelperText">选择一条提示词后，可在当前页面快速确认内容并执行。</div>
+            </div>
           </section>
         </div>
       </main>
