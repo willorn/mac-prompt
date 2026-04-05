@@ -1607,6 +1607,39 @@
         box-shadow: none !important;
       }
 
+      .mode-switch {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin: 2px 0 10px;
+        padding: 4px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid #d9e4f2;
+        border-radius: 12px;
+      }
+
+      .mode-switch-btn {
+        padding: 8px 10px !important;
+        border: none !important;
+        border-radius: 10px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: var(--nb-text-muted) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+      }
+
+      .mode-switch-btn.active {
+        background: #ffffff !important;
+        color: var(--nb-ink) !important;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
+      }
+
+      .mode-switch-btn:hover,
+      .mode-switch-btn:active {
+        transform: none !important;
+      }
+
       .search-wrapper::before {
         opacity: 0.72;
         filter: none;
@@ -2044,6 +2077,19 @@
         box-shadow: none !important;
       }
 
+      body[data-app-mode="use"] #addBtn,
+      body[data-app-mode="use"] .manage-only {
+        display: none !important;
+      }
+
+      body[data-app-mode="manage"] #editModeIndicator {
+        opacity: 1 !important;
+      }
+
+      body[data-app-mode="use"] #editModeIndicator {
+        opacity: 0.6 !important;
+      }
+
       @media (max-width: 1080px) {
         .card-header {
           grid-template-columns: minmax(0, 1fr);
@@ -2279,6 +2325,10 @@
     <div class="app-container">
       <aside id="sidebar">
         <div class="logo">PromptBox<small>Prompt Library</small></div>
+        <div class="mode-switch" id="modeSwitch" aria-label="应用模式切换">
+          <button class="mode-switch-btn active" id="modeUseBtn" type="button">使用</button>
+          <button class="mode-switch-btn" id="modeManageBtn" type="button">管理</button>
+        </div>
         <a href="#" class="nav-item active" data-filter="all">全部提示词</a>
         <button
           id="addTagBtn"
@@ -2408,9 +2458,9 @@
                 </div>
                 <div class="preview-actions-inline">
                   <button class="accent-btn" id="previewUse">立即使用</button>
-                  <button class="ghost-btn" id="previewPin">置顶</button>
-                  <button class="ghost-btn" id="previewEdit">编辑</button>
-                  <button class="ghost-btn danger-btn" id="previewDelete">删除</button>
+                  <button class="ghost-btn manage-only" id="previewPin">置顶</button>
+                  <button class="ghost-btn manage-only" id="previewEdit">编辑</button>
+                  <button class="ghost-btn danger-btn manage-only" id="previewDelete">删除</button>
                 </div>
               </div>
               <div class="preview-title" id="previewTitle">未选择</div>

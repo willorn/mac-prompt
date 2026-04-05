@@ -121,6 +121,9 @@ function escapeHtml(value) {
   const modal = document.getElementById("modalOverlay");
   const modalTitle = modal.querySelector("h2");
   const settingsBtn = document.getElementById("settingsBtn");
+  const modeUseBtn = document.getElementById("modeUseBtn");
+  const modeManageBtn = document.getElementById("modeManageBtn");
+  const editModeIndicator = document.getElementById("editModeIndicator");
 
   const previewPanel = document.getElementById("previewPanel");
   const previewTitle = document.getElementById("previewTitle");
@@ -193,8 +196,43 @@ function escapeHtml(value) {
   let selectedIndex = null;
   let contextMenuTargetIndex = null;
   let renameTagOriginal = null;
+  let appMode = "use";
 
   const normalizeTag = (tag) => (typeof tag === "string" ? tag.trim() : "");
+
+  function loadAppMode() {
+    try {
+      const stored = window.localStorage.getItem("promptbox.appMode");
+      return stored === "manage" ? "manage" : "use";
+    } catch {
+      return "use";
+    }
+  }
+
+  function persistAppMode(mode) {
+    try {
+      window.localStorage.setItem("promptbox.appMode", mode);
+    } catch {}
+  }
+
+  function applyAppMode() {
+    document.body.dataset.appMode = appMode;
+    if (modeUseBtn) modeUseBtn.classList.toggle("active", appMode === "use");
+    if (modeManageBtn) modeManageBtn.classList.toggle("active", appMode === "manage");
+    if (editModeIndicator) {
+      editModeIndicator.textContent = appMode === "manage" ? "管理模式" : "使用模式";
+      editModeIndicator.style.color = appMode === "manage" ? "var(--accent)" : "var(--muted)";
+    }
+    if (appMode !== "manage") {
+      hideContextMenu();
+    }
+  }
+
+  function setAppMode(mode) {
+    appMode = mode === "manage" ? "manage" : "use";
+    persistAppMode(appMode);
+    applyAppMode();
+  }
 
   function sanitizeTagList(list) {
     if (list == null) return [];
@@ -528,6 +566,7 @@ function escapeHtml(value) {
 
   // Context Menu Functions
   function showContextMenu(e, item) {
+    if (appMode !== "manage") return;
     if (!contextMenu) return;
     contextMenuTargetIndex = item.originalIndex;
 
@@ -1384,6 +1423,17 @@ function escapeHtml(value) {
     };
   }
   if (pasteConfigApply) pasteConfigApply.onclick = applyPastedConfig;
+
+  if (modeUseBtn) {
+    modeUseBtn.onclick = () => setAppMode("use");
+  }
+
+  if (modeManageBtn) {
+    modeManageBtn.onclick = () => setAppMode("manage");
+  }
+
+  appMode = loadAppMode();
+  applyAppMode();
 
   window.addEventListener("load", () => {
     searchInput.focus();
