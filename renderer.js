@@ -40,6 +40,9 @@ function normalizePrompt(prompt) {
     tag: typeof prompt.tag === "string" ? prompt.tag.trim() : "",
     content,
     isPinned: prompt.isPinned === true,
+    useCount: Math.max(0, Number(prompt.useCount || 0)),
+    lastUsedAt:
+      typeof prompt.lastUsedAt === "string" ? prompt.lastUsedAt.trim() : "",
   };
 }
 
@@ -114,7 +117,51 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-  document.addEventListener("DOMContentLoaded", () => {
+function toTimestamp(value) {
+  const time = Date.parse(value || "");
+  return Number.isFinite(time) ? time : 0;
+}
+
+function formatRelativeTime(value) {
+  const timestamp = toTimestamp(value);
+  if (!timestamp) return "最近未使用";
+  const diff = Date.now() - timestamp;
+  if (diff < 60 * 1000) return "刚刚使用";
+  if (diff < 60 * 60 * 1000) return `${Math.floor(diff / (60 * 1000))} 分钟前`;
+  if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / (60 * 60 * 1000))} 小时前`;
+  if (diff < 30 * 24 * 60 * 60 * 1000) return `${Math.floor(diff / (24 * 60 * 60 * 1000))} 天前`;
+  return new Date(timestamp).toLocaleDateString("zh-CN");
+}
+
+function getUsageSummary(item) {
+  const count = Math.max(0, Number(item?.useCount || 0));
+  return {
+    useText: count > 0 ? `已使用 ${count} 次` : "尚未使用",
+    lastUsedText: formatRelativeTime(item?.lastUsedAt),
+  };
+}
+
+function comparePromptsForUse(a, b) {
+  const lastUsedDiff = toTimestamp(b.lastUsedAt) - toTimestamp(a.lastUsedAt);
+  if (lastUsedDiff !== 0) return lastUsedDiff;
+  const useCountDiff = Math.max(0, Number(b.useCount || 0)) - Math.max(0, Number(a.useCount || 0));
+  if (useCountDiff !== 0) return useCountDiff;
+  return String(a.name || "").localeCompare(String(b.name || ""), "zh-CN");
+}
+
+function comparePromptsForManage(a, b) {
+  const tagDiff = normalizeTag(a?.tag).localeCompare(normalizeTag(b?.tag), "zh-CN");
+  if (tagDiff !== 0) return tagDiff;
+  return String(a?.name || "").localeCompare(String(b?.name || ""), "zh-CN");
+}
+
+function markPromptUsed(prompt) {
+  if (!prompt || typeof prompt !== "object") return;
+  prompt.useCount = Math.max(0, Number(prompt.useCount || 0)) + 1;
+  prompt.lastUsedAt = new Date().toISOString();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
   const navItemsContainer = document.getElementById("sidebar");
   const cardGrid = document.getElementById("cardGrid");
   const searchInput = document.getElementById("searchInput");
@@ -133,6 +180,8 @@ function escapeHtml(value) {
   const previewMode = document.getElementById("previewMode");
   const previewHelperTitle = document.getElementById("previewHelperTitle");
   const previewHelperText = document.getElementById("previewHelperText");
+  const previewActionSummary = document.getElementById("previewActionSummary");
+  const previewUsageStats = document.getElementById("previewUsageStats");
   const previewUse = document.getElementById("previewUse");
   const previewPin = document.getElementById("previewPin");
   const previewEdit = document.getElementById("previewEdit");
@@ -689,17 +738,24 @@ function escapeHtml(value) {
 
   function clearPreview() {
     selectedIndex = null;
-    if (previewTitle) previewTitle.textContent = appMode === "manage" ? "整理当前提示词" : "提示词详情";
+    if (previewTitle) previewTitle.textContent = appMode === "manage" ? "整理当前提示词" : "准备调用提示词";
     if (previewBody) {
       previewBody.textContent =
         appMode === "manage"
           ? "从左侧选择一条提示词，然后在右侧进行置顶、编辑或删除。"
-          : "从左侧选择一条提示词，这里会显示完整内容。";
+          : "先移动鼠标或键盘选中一条提示词，再单击卡片立即发送到当前输入框。";
     }
     if (previewTag) previewTag.textContent = "未选择";
     if (previewMode) {
       previewMode.textContent =
         appMode === "manage" ? "请选择要整理的提示词" : "请选择一条提示词";
+    }
+    if (previewActionSummary) {
+      previewActionSummary.textContent =
+        appMode === "manage" ? "管理模式下仅选中与整理" : "单击左侧卡片立即使用";
+    }
+    if (previewUsageStats) {
+      previewUsageStats.textContent = "暂无使用记录";
     }
     if (previewHelperTitle) {
       previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
@@ -708,7 +764,7 @@ function escapeHtml(value) {
       previewHelperText.textContent =
         appMode === "manage"
           ? "管理模式下点击列表只会选中，不会直接执行；请在右侧完成置顶、编辑或删除。"
-          : "使用模式下点击卡片内容会立刻尝试复制并粘贴到当前输入位置。";
+          : "选中提示词后，单击卡片或按回车键即可立即使用，自动粘贴到当前输入框。";
     }
     if (previewUse) previewUse.disabled = true;
     if (previewPin) {
@@ -719,11 +775,11 @@ function escapeHtml(value) {
     if (previewDelete) previewDelete.disabled = true;
     if (previewPanel) previewPanel.style.opacity = "0.9";
     applyPreviewTheme(null);
-    if (resultCount) resultCount.textContent = "0";
   }
 
   function updatePreview(item) {
     if (!item) return;
+    const { useText, lastUsedText } = getUsageSummary(item);
     if (previewTitle) previewTitle.textContent = item.name || "未命名";
     if (previewBody) previewBody.textContent = item.content || "";
     if (previewTag) previewTag.textContent = normalizeTag(item.tag) || "默认";
@@ -731,7 +787,14 @@ function escapeHtml(value) {
       previewMode.textContent =
         appMode === "manage"
           ? "当前为管理模式：点击卡片只选中，不会直接执行"
-          : "点击卡片内容即可直接使用，也可按回车执行";
+          : "当前为使用模式：单击卡片立即执行，回车也可使用";
+    }
+    if (previewActionSummary) {
+      previewActionSummary.textContent =
+        appMode === "manage" ? "在此完成置顶、编辑或删除" : "单击左侧卡片，立即返回原输入框";
+    }
+    if (previewUsageStats) {
+      previewUsageStats.textContent = `${useText} · ${lastUsedText}`;
     }
     if (previewHelperTitle) {
       previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
@@ -740,7 +803,7 @@ function escapeHtml(value) {
       previewHelperText.textContent =
         appMode === "manage"
           ? `你正在整理「${item.name || "未命名"}」，可在右侧完成置顶、编辑或删除。`
-          : `你可以直接点击左侧卡片内容，或在这里确认内容后点击“立即使用”。`;
+          : `确认内容后，点击"立即使用"或直接按回车键，即可粘贴到当前输入框。`;
     }
     if (previewUse) previewUse.disabled = appMode === "manage";
     if (previewPin) {
@@ -773,6 +836,9 @@ function escapeHtml(value) {
       return result;
     }
 
+    markPromptUsed(item);
+    await saveData();
+
     if (card) {
       card.style.boxShadow = "0 0 0 3px rgba(79, 140, 255, 0.14), 0 16px 34px rgba(15, 23, 42, 0.1)";
       setTimeout(() => (card.style.boxShadow = item.isPinned ? "0 14px 30px rgba(15, 23, 42, 0.08)" : ""), 500);
@@ -801,13 +867,12 @@ function escapeHtml(value) {
     const tags = getAllTagNames();
 
     if (tags.length === 0) {
-      tagDropdown.innerHTML =
-        '<div style="padding: 10px; color: #94a3b8; font-size: 12px; text-align: center;">暂无已有标签</div>';
+      tagDropdown.innerHTML = '<div class="tag-dropdown-empty">暂无已有标签</div>';
     } else {
       tagDropdown.innerHTML = tags
         .map(
           (tag) => `
-                <div class="tag-option" style="padding: 10px 12px; cursor: pointer; font-size: 14px; color: #475569; transition: background 0.2s;">
+                <div class="tag-option">
                     ${escapeHtml(tag)}
                 </div>
             `,
@@ -820,8 +885,6 @@ function escapeHtml(value) {
         tagInput.value = option.innerText.trim();
         tagDropdown.style.display = "none";
       };
-      option.onmouseenter = () => (option.style.background = "#f1f5f9");
-      option.onmouseleave = () => (option.style.background = "transparent");
     });
 
     const currentFilter =
@@ -869,14 +932,9 @@ function escapeHtml(value) {
     a.href = "#";
     a.className = `nav-item ${isActive ? "active" : ""}`;
     a.dataset.filter = filter;
-    a.style.display = "flex";
-    a.style.alignItems = "center";
-    a.style.justifyContent = "space-between";
     const label = document.createElement("span");
+    label.className = "nav-item-label";
     label.textContent = text;
-    label.style.display = "inline-flex";
-    label.style.alignItems = "center";
-    label.style.gap = "4px";
     if (hidden && filter !== "all") {
       const flag = document.createElement("span");
       flag.className = "nav-hidden-flag";
@@ -884,11 +942,7 @@ function escapeHtml(value) {
       label.appendChild(flag);
     }
     const countBadge = document.createElement("span");
-    countBadge.style.fontSize = "10px";
-    countBadge.style.opacity = "0.6";
-    countBadge.style.background = "rgba(0,0,0,0.05)";
-    countBadge.style.padding = "2px 6px";
-    countBadge.style.borderRadius = "10px";
+    countBadge.className = "nav-count-badge";
     countBadge.textContent = count;
     a.appendChild(label);
     a.appendChild(countBadge);
@@ -913,10 +967,12 @@ function escapeHtml(value) {
     cardGrid.innerHTML = "";
     let visibleCount = 0;
     const visibleIndices = [];
-    const displayList = [...allPrompts]
-      .map((item, originalIndex) => ({ ...item, originalIndex }))
-      .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
+    const displayList = [...allPrompts].map((item, originalIndex) => ({
+      ...item,
+      originalIndex,
+    }));
     const pinnedItems = [];
+    const recentItems = [];
     const regularItems = [];
 
     const createSection = (title, note) => {
@@ -941,10 +997,11 @@ function escapeHtml(value) {
     };
 
     displayList.forEach((item) => {
+      const normalizedTag = normalizeTag(item.tag);
       const matchesSearch =
         item.name.toLowerCase().includes(term) ||
-        item.content.toLowerCase().includes(term);
-      const normalizedTag = normalizeTag(item.tag);
+        item.content.toLowerCase().includes(term) ||
+        normalizedTag.toLowerCase().includes(term);
       const matchesCategory =
         activeFilter === "all"
           ? !isTagHidden(normalizedTag)
@@ -954,11 +1011,9 @@ function escapeHtml(value) {
         visibleCount += 1;
         const card = document.createElement("div");
         card.className = "card";
-        const interactionHint = appMode === "manage" ? "点击查看" : "点击即用";
+        const interactionHint = appMode === "manage" ? "点击查看" : "单击即用";
+        const { useText, lastUsedText } = getUsageSummary(item);
         if (item.isPinned) {
-          card.style.border = "1px solid #d4e2f6";
-          card.style.boxShadow = "0 14px 30px rgba(15, 23, 42, 0.08)";
-          card.style.backgroundColor = "#f6faff";
           card.classList.add("pinned-card");
         }
 
@@ -966,9 +1021,12 @@ function escapeHtml(value) {
         card.dataset.originalIndex = item.originalIndex;
         card.addEventListener("mouseenter", () => selectCard(item.originalIndex, true));
         card.addEventListener("focus", () => selectCard(item.originalIndex, true));
-        card.addEventListener("click", () => {
+        card.addEventListener("click", async () => {
           selectCard(item.originalIndex);
           card.focus();
+          if (appMode !== "manage") {
+            await handleUsePrompt();
+          }
         });
 
         const handleUsePrompt = async () => usePromptAtIndex(item.originalIndex, card);
@@ -1015,6 +1073,10 @@ function escapeHtml(value) {
               </span>
             </div>
           </div>
+          <div class="card-footer">
+            <span class="card-usage">${escapeHtml(useText)}</span>
+            <span class="card-last-used">${escapeHtml(lastUsedText)}</span>
+          </div>
         `;
 
         card.oncontextmenu = (e) => {
@@ -1022,19 +1084,10 @@ function escapeHtml(value) {
           showContextMenu(e, item);
         };
 
-        const cardContent = card.querySelector('.card-content');
-        if (cardContent) {
-          cardContent.onclick = async (e) => {
-            e.stopPropagation();
-            selectCard(item.originalIndex);
-            card.focus();
-            if (appMode !== "manage") {
-              await handleUsePrompt();
-            }
-          }
-        }
         if (item.isPinned) {
           pinnedItems.push(card);
+        } else if (toTimestamp(item.lastUsedAt) > 0) {
+          recentItems.push({ card, item });
         } else {
           regularItems.push(card);
         }
@@ -1042,25 +1095,101 @@ function escapeHtml(value) {
       }
     });
 
-    if (pinnedItems.length > 0) {
-      const pinnedList = createSection(
-        "置顶快捷使用",
-        appMode === "manage" ? "管理模式下仅选中，避免误触执行" : "点击内容直接执行",
-      );
-      pinnedItems.forEach((card) => pinnedList.appendChild(card));
-    }
+    pinnedItems.sort((a, b) => {
+      const left = allPrompts[Number(a.dataset.originalIndex)];
+      const right = allPrompts[Number(b.dataset.originalIndex)];
+      return appMode === "manage"
+        ? comparePromptsForManage(left, right)
+        : comparePromptsForUse(left, right);
+    });
 
-    if (regularItems.length > 0) {
-      const regularList = createSection(
-        "全部结果",
-        appMode === "manage" ? "点击查看详情，右侧进行管理" : "点击内容直接执行，回车也可使用",
+    if (appMode === "manage") {
+      regularItems.sort((a, b) => {
+        const left = allPrompts[Number(a.dataset.originalIndex)];
+        const right = allPrompts[Number(b.dataset.originalIndex)];
+        return comparePromptsForManage(left, right);
+      });
+
+      if (pinnedItems.length > 0) {
+        const pinnedList = createSection("已置顶", "优先整理这些高频提示词");
+        pinnedItems.forEach((card) => pinnedList.appendChild(card));
+      }
+
+      if (regularItems.length > 0) {
+        const regularTitle = activeFilter === "all" ? "全部提示词" : `${activeFilter} 分类`;
+        const regularList = createSection(regularTitle, "点击查看详情，右侧进行整理");
+        regularItems.forEach((card) => regularList.appendChild(card));
+      }
+    } else {
+      recentItems.sort((a, b) => comparePromptsForUse(a.item, b.item));
+
+      const surfacedRecentItems = recentItems.slice(0, 4);
+      const surfacedRecentSet = new Set(
+        surfacedRecentItems.map(({ item }) => item.originalIndex),
       );
-      regularItems.forEach((card) => regularList.appendChild(card));
+      const remainingRecentCards = recentItems
+        .filter(({ item }) => !surfacedRecentSet.has(item.originalIndex))
+        .map(({ card }) => card);
+
+      regularItems.unshift(...remainingRecentCards);
+
+      if (pinnedItems.length > 0) {
+        const pinnedList = createSection("置顶快捷使用", "单击整张卡片直接执行");
+        pinnedItems.forEach((card) => pinnedList.appendChild(card));
+      }
+
+      if (surfacedRecentItems.length > 0) {
+        const recentList = createSection("最近使用", "根据最近调用自动前置，帮助形成肌肉记忆");
+        surfacedRecentItems.forEach(({ card }) => recentList.appendChild(card));
+      }
+
+      if (regularItems.length > 0) {
+        const regularList = createSection("全部结果", "支持鼠标单击与键盘回车快速执行");
+        regularItems.sort((a, b) => {
+          const left = allPrompts[Number(a.dataset.originalIndex)];
+          const right = allPrompts[Number(b.dataset.originalIndex)];
+          return comparePromptsForUse(left, right);
+        });
+        regularItems.forEach((card) => regularList.appendChild(card));
+      }
     }
 
     if (resultCount) {
       resultCount.textContent = String(visibleCount);
     }
+
+    if (visibleCount === 0) {
+      const isEmpty = allPrompts.length === 0;
+      cardGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">${isEmpty ? "✨" : "🔍"}</div>
+          <div class="empty-state-title">${escapeHtml(
+            isEmpty ? "欢迎使用 PromptBox" : "没有匹配结果",
+          )}</div>
+          <div class="empty-state-text">${escapeHtml(
+            isEmpty
+              ? "这是你的 Prompt 快速调用层。切换到管理模式，新增第一条提示词开始使用。"
+              : "试试更短的关键词、切换分类，或进入管理模式检查是否被隐藏。",
+          )}</div>
+          ${isEmpty ? `
+          <div class="empty-state-actions">
+            <button class="empty-state-btn primary" onclick="document.getElementById('modeManageBtn').click()">
+              进入管理模式
+            </button>
+          </div>
+          <div class="empty-state-shortcuts">
+            <span>快捷键：</span>
+            <kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>P</kbd> 唤起 · 
+            <kbd>↵</kbd> 使用 · 
+            <kbd>⌘</kbd> + <kbd>,</kbd> 设置
+          </div>
+          ` : ""}
+        </div>
+      `;
+      clearPreview();
+      return;
+    }
+
     if (visibleIndices.length === 0) {
       clearPreview();
     } else if (!visibleIndices.includes(selectedIndex)) {
@@ -1074,7 +1203,7 @@ function escapeHtml(value) {
   });
 
   searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === "Tab") {
+    if (e.key === "Enter" || e.key === "Tab" || e.key === "ArrowDown") {
       const firstCard = document.querySelector(".card");
       if (firstCard) {
         firstCard.focus();
@@ -1098,7 +1227,14 @@ function escapeHtml(value) {
         content,
       };
     } else {
-      allPrompts.push({ name, tag, content, isPinned: false });
+      allPrompts.push({
+        name,
+        tag,
+        content,
+        isPinned: false,
+        useCount: 0,
+        lastUsedAt: "",
+      });
     }
 
     modal.style.display = "none";
@@ -1514,6 +1650,77 @@ function escapeHtml(value) {
   if (modeManageBtn) {
     modeManageBtn.onclick = () => setAppMode("manage");
   }
+
+  function isTypingTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return (
+      target.isContentEditable ||
+      tagName === "INPUT" ||
+      tagName === "TEXTAREA" ||
+      tagName === "SELECT"
+    );
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (contextMenu?.style.display === "block") {
+        hideContextMenu();
+        return;
+      }
+      if (moreMenu?.style.display === "block") {
+        moreMenu.style.display = "none";
+        return;
+      }
+      if (modal?.style.display === "flex") {
+        modal.style.display = "none";
+        return;
+      }
+      if (pasteConfigOverlay?.style.display === "flex") {
+        closePasteConfigModal();
+        return;
+      }
+      if (copyConfigOverlay?.style.display === "flex") {
+        closeCopyConfigModal();
+        return;
+      }
+      if (renameTagOverlay?.style.display === "flex") {
+        closeRenameTagModal();
+        return;
+      }
+      if (hiddenTagsOverlay?.style.display === "flex") {
+        closeHiddenTagsModal();
+        return;
+      }
+      if (webdavOverlay?.style.display === "flex") {
+        closeWebdavModal();
+        return;
+      }
+      closeCurrentWindowSilently();
+      return;
+    }
+
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+      return;
+    }
+
+    if ((e.metaKey || e.ctrlKey) && e.key === ",") {
+      e.preventDefault();
+      if (moreMenu) {
+        moreMenu.style.display = moreMenu.style.display === "block" ? "none" : "block";
+      }
+      return;
+    }
+
+    if (e.key === "/" && !isTypingTarget(e.target)) {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
 
   appMode = loadAppMode();
   applyAppMode();

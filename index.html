@@ -193,99 +193,6 @@
         backdrop-filter: blur(16px);
       }
 
-      .card {
-        padding: 10px 12px;
-        border-radius: 12px;
-        cursor: pointer;
-        user-select: none;
-        position: relative;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        background: transparent;
-      }
-
-      .card:hover {
-        background: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-      }
-
-      .card:focus {
-        outline: none;
-        background: #eef3ff;
-      }
-
-      .card.active-card {
-        background: #eef3ff;
-        box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.24);
-      }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .card-title {
-        font-weight: 600;
-        font-size: 13px;
-        margin: 0;
-      }
-
-      .card-body {
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        margin-top: 4px;
-      }
-
-      .card-meta {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 10px;
-        color: var(--muted);
-      }
-
-      .card-tag {
-        padding: 2px 8px;
-        background: rgba(10, 132, 255, 0.12);
-        color: var(--accent);
-        border-radius: 999px;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-      }
-
-      .card-actions {
-        display: flex;
-        gap: 8px;
-        opacity: 0;
-        transition: opacity 0.15s ease;
-      }
-
-      .card:hover .card-actions,
-      .card:focus .card-actions {
-        opacity: 1;
-      }
-
-      .card-actions button {
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        color: #9a9aa0;
-        font-size: 12px;
-        letter-spacing: 0.2px;
-      }
-
-      .card-actions button:hover {
-        color: var(--accent);
-      }
-
       .preview-panel {
         --preview-hue: 220;
         background: radial-gradient(600px 220px at 0% 0%, hsla(var(--preview-hue), 80%, 94%, 0.9), rgba(255, 255, 255, 0.92));
@@ -464,17 +371,6 @@
         flex-wrap: wrap;
         gap: 8px;
         justify-content: flex-end;
-      }
-
-      .modal-hint {
-        font-size: 11px;
-        color: var(--muted);
-      }
-
-      .modal-hint code {
-        background: rgba(10, 132, 255, 0.08);
-        padding: 2px 6px;
-        border-radius: 6px;
       }
 
       /* WebDAV Modal - Apple Style */
@@ -934,10 +830,6 @@
         cursor: pointer;
       }
 
-      main {
-        background: transparent;
-      }
-
       header {
         background: var(--accent) !important;
         border-bottom: 3px solid var(--ink) !important;
@@ -1068,11 +960,6 @@
         gap: 18px;
       }
 
-      .list-panel,
-      .preview-panel {
-        position: relative;
-      }
-
       .list-header {
         color: var(--ink);
         font-size: 12px;
@@ -1080,8 +967,7 @@
         letter-spacing: 0.8px;
       }
 
-      .list-header > span,
-      .preview-kicker {
+      .list-header > span {
         display: inline-flex;
         align-items: center;
         padding: 5px 10px;
@@ -1416,7 +1302,6 @@
       }
 
       .modal-subtitle,
-      .modal-hint,
       .hidden-tags-header p,
       .rename-header p {
         color: var(--muted);
@@ -1430,12 +1315,6 @@
       #pasteConfigOverlay h2 {
         letter-spacing: 0.5px;
         font-weight: 800;
-      }
-
-      #copyConfigText,
-      #pasteConfigText {
-        font-family: "SF Mono", "JetBrains Mono", monospace !important;
-        line-height: 1.55;
       }
 
       #copyConfigOverlay p,
@@ -1566,6 +1445,10 @@
         font-size: 12px;
         font-weight: 600;
         color: var(--nb-text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
         background: transparent !important;
         border: none !important;
         border-radius: 10px;
@@ -1596,6 +1479,21 @@
         background: #e8f1ff;
         border: none;
         border-radius: 999px;
+      }
+
+      .nav-item-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .nav-count-badge {
+        font-size: 10px;
+        opacity: 0.6;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 2px 6px;
+        border-radius: 10px;
       }
 
       #addTagBtn {
@@ -1678,6 +1576,25 @@
         box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.1) !important;
       }
 
+      .tag-option {
+        padding: 10px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #475569;
+        transition: background 0.2s ease;
+      }
+
+      .tag-dropdown-empty {
+        padding: 10px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .tag-option:hover {
+        background: #f1f5f9;
+      }
+
       #settingsBtn,
       button,
       .menu-item,
@@ -1703,6 +1620,29 @@
         height: 32px !important;
         padding: 0 !important;
         box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06) !important;
+      }
+
+      #settingsBtn {
+        position: relative;
+        font-size: 0 !important;
+        color: transparent !important;
+      }
+
+      .toolbar-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .toolbar-dots span {
+        width: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: #607086;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
       }
 
       .menu-item:hover,
@@ -1783,8 +1723,7 @@
         letter-spacing: 0.4px;
       }
 
-      .list-header > span,
-      .preview-kicker {
+      .list-header > span {
         display: inline-flex;
         align-items: center;
         padding: 5px 10px;
@@ -1879,6 +1818,12 @@
         box-shadow:
           0 0 0 1px rgba(79, 140, 255, 0.16),
           0 18px 38px rgba(15, 23, 42, 0.09) !important;
+      }
+
+      .pinned-card {
+        border-color: #d4e2f6 !important;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08) !important;
+        background: #f6faff !important;
       }
 
       .card-header {
@@ -2123,12 +2068,170 @@
         display: none !important;
       }
 
+      /* Use Mode: Card is the primary action */
+      body[data-app-mode="use"] .card {
+        position: relative;
+        cursor: pointer;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body[data-app-mode="use"] .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        transition: box-shadow 0.2s ease;
+      }
+
+      body[data-app-mode="use"] .card:hover::after {
+        box-shadow: inset 0 0 0 2px var(--pb-accent);
+      }
+
+      body[data-app-mode="use"] .card:active {
+        transform: scale(0.995);
+      }
+
+      body[data-app-mode="use"] .card-actions {
+        display: none !important;
+      }
+
+      body[data-app-mode="use"] .card-hint {
+        background: var(--pb-accent-soft);
+        color: var(--pb-accent);
+        font-weight: 600;
+      }
+
+      body[data-app-mode="use"] .card-section-title {
+        color: var(--pb-accent);
+      }
+
+      /* Preview Panel: Use mode optimizations */
+      body[data-app-mode="use"] .preview-actions-inline {
+        gap: 0;
+      }
+
+      body[data-app-mode="use"] #previewUse {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        min-height: 40px;
+        padding: 10px 18px !important;
+        font-family: "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.1;
+        letter-spacing: 0;
+        font-weight: 600;
+        white-space: nowrap;
+        min-width: 116px;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 18px rgba(79, 140, 255, 0.22) !important;
+        transition: all 0.2s ease;
+      }
+
+      body[data-app-mode="use"] #previewUse:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(79, 140, 255, 0.28) !important;
+      }
+
+      body[data-app-mode="use"] #previewUse small {
+        font-size: 11px;
+        opacity: 0.8;
+        font-weight: 500;
+      }
+
+      body[data-app-mode="use"] #previewUse:disabled {
+        opacity: 0.5;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
       body[data-app-mode="manage"] #editModeIndicator {
         opacity: 1 !important;
       }
 
       body[data-app-mode="use"] #editModeIndicator {
         opacity: 0.6 !important;
+      }
+
+      /* Sidebar Footer & Settings Button */
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--pb-accent-border);
+      }
+
+      .sidebar-settings-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 36px;
+        padding: 8px 12px !important;
+        background: transparent !important;
+        border: 1px solid var(--pb-accent-border) !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+        color: var(--pb-muted) !important;
+        font-family: "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
+        font-size: 12px !important;
+        line-height: 1;
+        letter-spacing: 0;
+        font-weight: 500 !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #settingsBtn.sidebar-settings-btn {
+        position: static;
+        width: 100% !important;
+        height: auto !important;
+        font-size: 12px !important;
+        color: var(--pb-muted) !important;
+      }
+
+      .sidebar-settings-btn:hover {
+        background: var(--pb-accent-soft) !important;
+        color: var(--pb-accent) !important;
+        border-color: var(--pb-accent) !important;
+        box-shadow: 0 8px 18px rgba(79, 140, 255, 0.12) !important;
+        transform: translateY(-1px);
+      }
+
+      .sidebar-settings-btn:active {
+        transform: translateY(0) !important;
+        box-shadow: none !important;
+      }
+
+      .sidebar-settings-btn .toolbar-dots {
+        width: auto;
+        height: auto;
+      }
+
+      .sidebar-settings-btn .toolbar-dots span {
+        width: 3px;
+        height: 3px;
+        background: currentColor;
+        box-shadow: none;
+      }
+
+      .sidebar-settings-label {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* Sidebar Menu Position */
+      .sidebar-menu {
+        position: fixed;
+        left: 200px;
+        bottom: 20px;
+        top: auto;
+        right: auto;
+        width: 180px;
       }
 
       @media (max-width: 1080px) {
@@ -2283,7 +2386,6 @@
       }
 
       .modal-subtitle,
-      .modal-hint,
       .hidden-tags-header p,
       .rename-header p,
       #copyConfigOverlay p,
@@ -2358,6 +2460,597 @@
         background: transparent !important;
         padding: 0 !important;
       }
+
+      /* Execute-first polish */
+      :root {
+        --pb-accent: #4f8cff;
+        --pb-accent-soft: #edf4ff;
+        --pb-accent-border: #d5e3fb;
+        --pb-panel-border: #dce7f4;
+        --pb-text: #18263a;
+        --pb-muted: #607086;
+      }
+
+      .content-wrap {
+        grid-template-columns: minmax(500px, 1.25fr) minmax(320px, 0.82fr) !important;
+        gap: 18px !important;
+        padding: 20px 22px 22px !important;
+      }
+
+      .list-scroll {
+        padding: 8px !important;
+        gap: 8px !important;
+      }
+
+      .card-section {
+        gap: 6px !important;
+      }
+
+      .card-section + .card-section {
+        margin-top: 6px !important;
+        padding-top: 12px !important;
+      }
+
+      .card-section-list {
+        gap: 8px !important;
+      }
+
+      .card,
+      .card:nth-child(4n + 1),
+      .card:nth-child(4n + 2),
+      .card:nth-child(4n + 3),
+      .card:nth-child(4n + 4) {
+        padding: 11px 12px !important;
+      }
+
+      body[data-app-mode="use"] .card {
+        cursor: pointer;
+      }
+
+      body[data-app-mode="manage"] .card {
+        cursor: default;
+      }
+
+      .card-title {
+        font-size: 14px !important;
+      }
+
+      .card-body {
+        font-size: 12.5px !important;
+        line-height: 1.42 !important;
+      }
+
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #edf2f8;
+        font-size: 11px;
+        color: var(--pb-muted);
+        min-width: 0;
+      }
+
+      .card-usage,
+      .card-last-used {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .card-last-used {
+        text-align: right;
+      }
+
+      .card-actions {
+        max-width: 132px !important;
+      }
+
+      .preview-panel {
+        padding: 18px 18px 16px !important;
+        gap: 12px !important;
+        background: linear-gradient(180deg, #f7fbff 0%, #f2f7ff 100%) !important;
+      }
+
+      .preview-title {
+        font-size: 20px !important;
+      }
+
+      .preview-body {
+        padding: 12px 14px !important;
+        font-size: 13.5px !important;
+        line-height: 1.68 !important;
+      }
+
+      .preview-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .summary-card {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+        padding: 12px 14px;
+        border: 1px solid var(--pb-accent-border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.88);
+      }
+
+      .summary-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--pb-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .summary-value {
+        min-width: 0;
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: var(--pb-text);
+      }
+
+      .preview-helper {
+        gap: 4px !important;
+        padding: 12px 14px !important;
+      }
+
+      .preview-helper-title {
+        font-size: 11px !important;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #4169ad !important;
+      }
+
+      .preview-helper-text {
+        font-size: 12px !important;
+      }
+
+      #previewUse {
+        background: var(--pb-accent) !important;
+        color: #fff !important;
+        border-color: transparent !important;
+        font-family: "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
+        text-rendering: geometricPrecision;
+      }
+
+      #previewPin,
+      #previewEdit,
+      #previewDelete {
+        background: rgba(255, 255, 255, 0.85) !important;
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        min-height: 190px;
+        padding: 22px;
+        border: 1px dashed var(--pb-accent-border);
+        border-radius: 16px;
+        background: linear-gradient(180deg, #fbfdff 0%, #f4f8ff 100%);
+        color: var(--pb-text);
+      }
+
+      .empty-state-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .empty-state-text {
+        max-width: 360px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--pb-muted);
+      }
+
+      .empty-state-icon {
+        font-size: 32px;
+        margin-bottom: 4px;
+      }
+
+      .empty-state-actions {
+        margin-top: 8px;
+      }
+
+      .empty-state-btn {
+        padding: 10px 20px;
+        background: var(--pb-accent);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .empty-state-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(79, 140, 255, 0.35);
+      }
+
+      .empty-state-shortcuts {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px dashed var(--pb-accent-border);
+        font-size: 11px;
+        color: var(--pb-muted);
+      }
+
+      .empty-state-shortcuts kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        padding: 2px 6px;
+        background: white;
+        border: 1px solid var(--pb-accent-border);
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--pb-text);
+        box-shadow: 0 2px 0 var(--pb-accent-border);
+      }
+
+      @media (max-width: 1180px) {
+        .content-wrap {
+          grid-template-columns: minmax(0, 1fr) !important;
+        }
+
+        .preview-panel {
+          min-height: 0;
+        }
+      }
+
+      .sidebar-primary-btn {
+        width: 100%;
+        margin-top: auto;
+        padding: 12px;
+      }
+
+      .app-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        height: 50px;
+        min-height: 50px;
+        max-height: 50px;
+        padding: 0 20px;
+        box-sizing: border-box;
+        overflow: visible;
+        z-index: 50;
+      }
+
+      .header-menu {
+        position: absolute;
+        right: 20px;
+        top: 52px;
+        width: 186px;
+        padding: 6px;
+        display: none;
+        z-index: 200;
+      }
+
+      .menu-section-title {
+        padding: 6px 10px 4px;
+        font-size: 10px;
+        letter-spacing: 0.4px;
+        color: var(--nb-text-muted);
+        text-transform: uppercase;
+      }
+
+      .menu-divider {
+        height: 1px;
+        margin: 6px 0;
+        background: var(--divider);
+      }
+
+      .list-header {
+        cursor: default;
+        user-select: none;
+      }
+
+      .list-header-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mode-indicator {
+        font-size: 11px;
+        opacity: 0;
+        transition: opacity 0.2s ease, color 0.2s ease;
+      }
+
+      .prompt-modal {
+        width: 500px;
+        max-width: calc(100vw - 40px);
+      }
+
+      .prompt-modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .modal-field--dropdown {
+        position: relative;
+      }
+
+      .prompt-modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      .tag-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 110;
+        background: var(--nb-surface);
+        border: 1px solid #dce7f4;
+        border-radius: 12px;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+      }
+
+      .system-modal-card {
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #modalOverlay,
+      #webdavOverlay,
+      #copyConfigOverlay,
+      #pasteConfigOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+
+      #modalOverlay {
+        z-index: 100;
+      }
+
+      #webdavOverlay {
+        z-index: 120;
+      }
+
+      #copyConfigOverlay,
+      #pasteConfigOverlay {
+        z-index: 130;
+      }
+
+      .system-modal-card--wide {
+        max-width: 480px;
+        max-height: calc(100vh - 80px);
+      }
+
+      .system-modal-card--compact {
+        max-width: 400px;
+      }
+
+      .system-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 24px 16px;
+      }
+
+      .system-modal-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--nb-ink);
+        letter-spacing: -0.2px;
+      }
+
+      .system-modal-subtitle {
+        margin: 4px 0 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--nb-text-muted);
+      }
+
+      .system-modal-body {
+        padding: 20px 24px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        overflow-y: auto;
+      }
+
+      .system-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .system-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--nb-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .system-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
+        background: rgba(120, 120, 128, 0.06);
+        border-radius: 12px;
+      }
+
+      .system-grid-two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .system-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .system-actions-three {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+
+      .system-row-between {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .system-row-hint {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .system-inline-note {
+        font-size: 12px;
+        color: var(--nb-text-muted);
+      }
+
+      .system-field-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--nb-ink);
+      }
+
+      .system-field-desc {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--nb-text-muted);
+      }
+
+      .system-link-button {
+        align-self: flex-start;
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+      }
+
+      .system-primary-button {
+        width: 100%;
+        padding: 12px !important;
+        font-size: 14px !important;
+      }
+
+      .system-secondary-button {
+        padding: 12px !important;
+        font-size: 14px !important;
+      }
+
+      .system-refresh-button {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+
+      .system-select {
+        width: 100%;
+        min-height: 168px;
+        padding: 10px 12px;
+        font-size: 13px;
+        outline: none;
+      }
+
+      .system-textarea {
+        width: 100%;
+        height: 120px;
+        padding: 12px;
+        box-sizing: border-box;
+        resize: none;
+      }
+
+      .system-textarea[readonly] {
+        background: rgba(120, 120, 128, 0.06);
+      }
+
+      .system-config-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .system-hidden {
+        display: none !important;
+      }
+
+      .context-menu {
+        display: none;
+        position: fixed;
+        min-width: 140px;
+        padding: 6px 0;
+        z-index: 1000;
+        font-size: 13px;
+      }
+
+      .context-menu-divider {
+        height: 1px;
+        background: var(--divider);
+        margin: 4px 8px;
+      }
+
+      .context-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      .context-menu-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        font-size: 12px;
+      }
+
+      #toast {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        font-size: 14px;
+        z-index: 1000;
+        transition: opacity 0.3s ease;
+      }
     </style>
     <script type="module" src="./renderer.js" defer></script>
   </head>
@@ -2371,122 +3064,47 @@
           <button class="mode-switch-btn" id="modeManageBtn" type="button">管理</button>
         </div>
         <a href="#" class="nav-item active" data-filter="all">全部提示词</a>
-        <button
-          id="addTagBtn"
-          style="
-            width: 100%;
-            display: none;
-            margin: 8px 0;
-            padding: 6px;
-            font-size: 12px;
-            border: 1px dashed #cbd5e1;
-            border-radius: 6px;
-            background: transparent;
-            color: #64748b;
-            cursor: pointer;
-          "
-        >
-          + 新增分类标签
-        </button>
+        <button id="addTagBtn">+ 新增分类标签</button>
 
-        <button
-          id="addBtn"
-          style="
-            margin-top: auto;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-          "
-        >
-          新增
-        </button>
-      </aside>
+        <button id="addBtn" class="sidebar-primary-btn">新增</button>
 
-      <main>
-        <header
-          style="
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 20px;
-            height: 50px;
-            min-height: 50px;
-            max-height: 50px;
-            box-sizing: border-box;
-            overflow: visible;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            justify-content: space-between;
-            z-index: 50;
-          "
-        >
-          <div class="search-wrapper">
-            <input
-              type="text"
-              id="searchInput"
-              class="search-input"
-              placeholder="搜索"
-            />
-
-          </div>
-          <button
-            id="settingsBtn"
-            title="系统"
-            style="
-              width: 36px;
-              height: 36px;
-              flex-shrink: 0;
-              flex-grow: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: white;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              cursor: pointer;
-              transition: all 0.2s;
-              font-size: 16px;
-              margin-right: 0;
-              visibility: visible;
-            "
-          >
-            ⋯
+        <div class="sidebar-footer">
+          <button id="settingsBtn" class="sidebar-settings-btn" title="设置 (⌘,)">
+            <span class="toolbar-dots" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+            <span class="sidebar-settings-label">系统</span>
           </button>
-          <div id="moreMenu" style="
-            position: absolute;
-            right: 20px;
-            top: 52px;
-            width: 180px;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            box-shadow: var(--shadow-soft);
-            padding: 6px;
-            display: none;
-            z-index: 200;
-            backdrop-filter: blur(18px);
-          ">
-            <div style="padding: 6px 10px 4px; font-size: 10px; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase;">数据与系统</div>
-            <button class="menu-item" id="menuImport">导入数据</button>
-            <button class="menu-item" id="menuExport">导出数据</button>
-            <button class="menu-item" id="menuWebdav">同步与备份</button>
-            <button class="menu-item" id="menuPermissions">权限说明</button>
-            <div style="height: 1px; background: var(--divider); margin: 6px 0;"></div>
-            <div class="manage-only" style="padding: 6px 10px 4px; font-size: 10px; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase;">整理</div>
-            <button class="menu-item manage-only" id="menuHiddenTags">隐藏分类设置</button>
-          </div>
-        </header>
+        </div>
 
-        <div class="content-wrap">
+        <div id="moreMenu" class="header-menu sidebar-menu">
+            <div class="menu-section-title">数据</div>
+            <button class="menu-item" id="menuImport">导入</button>
+            <button class="menu-item" id="menuExport">导出</button>
+            <button class="menu-item" id="menuWebdav">同步与备份</button>
+            <div class="menu-divider"></div>
+            <button class="menu-item" id="menuPermissions">权限说明</button>
+            <div class="menu-divider manage-only"></div>
+            <div class="manage-only menu-section-title">整理</div>
+            <button class="menu-item manage-only" id="menuHiddenTags">隐藏分类</button>
+          </div>
+        </aside>
+
+        <main>
+          <header class="app-header">
+            <div class="search-wrapper">
+              <input type="text" id="searchInput" class="search-input" placeholder="搜索" />
+            </div>
+          </header>
+
+          <div class="content-wrap">
           <section class="list-panel">
-            <div class="list-header" id="listHeader" style="cursor: pointer; user-select: none;">
+            <div class="list-header" id="listHeader">
               <span id="listHeaderTitle">快速调用</span>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span id="editModeIndicator" style="font-size: 11px; color: var(--accent); opacity: 0; transition: opacity 0.2s ease;">编辑模式</span>
+              <div class="list-header-meta">
+                <span id="editModeIndicator" class="mode-indicator">编辑模式</span>
                 <span id="resultCount">0</span>
               </div>
             </div>
@@ -2500,15 +3118,28 @@
                   <span class="preview-mode" id="previewMode">请选择一条提示词</span>
                 </div>
                 <div class="preview-actions-inline">
-                  <button class="accent-btn use-only" id="previewUse">立即使用</button>
+                  <button class="accent-btn use-only" id="previewUse">
+                    <span>立即使用</span>
+                    <small>↵ 回车</small>
+                  </button>
                   <button class="ghost-btn manage-only" id="previewPin">置顶</button>
                   <button class="ghost-btn manage-only" id="previewEdit">编辑</button>
                   <button class="ghost-btn danger-btn manage-only" id="previewDelete">删除</button>
                 </div>
               </div>
-              <div class="preview-title" id="previewTitle">未选择</div>
+              <div class="preview-title" id="previewTitle">准备调用提示词</div>
             </div>
-            <div class="preview-body" id="previewBody">从左侧选择一条提示词以查看完整内容。</div>
+            <div class="preview-body" id="previewBody">先移动鼠标或键盘选中一条提示词，再单击卡片立即发送到当前输入框。</div>
+            <div class="preview-summary">
+              <div class="summary-card">
+                <div class="summary-label">执行方式</div>
+                <div class="summary-value" id="previewActionSummary">单击左侧卡片立即使用</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">使用记录</div>
+                <div class="summary-value" id="previewUsageStats">暂无使用记录</div>
+              </div>
+            </div>
             <div class="preview-helper">
               <div class="preview-helper-title" id="previewHelperTitle">使用提示</div>
               <div class="preview-helper-text" id="previewHelperText">选择一条提示词后，可在当前页面快速确认内容并执行。</div>
@@ -2518,160 +3149,37 @@
       </main>
     </div>
 
-    <div
-      id="modalOverlay"
-      style="
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        z-index: 100;
-        align-items: center;
-        justify-content: center;
-      "
-    >
-      <div
-        style="
-          background: white;
-          width: 500px;
-          padding: 32px;
-          border-radius: 16px;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        "
-      >
-        <h2 style="margin-top: 0; margin-bottom: 20px; color: var(--text)">
-          新增提示词
-        </h2>
+    <div id="modalOverlay">
+      <div class="modal-card prompt-modal">
+        <h2 class="modal-title">新增提示词</h2>
+        <div class="prompt-modal-body">
+          <div class="modal-field">
+            <label for="newName">名称</label>
+            <input type="text" id="newName" class="modal-input" />
+          </div>
 
-        <div style="margin-bottom: 16px">
-          <label
-            style="
-              display: block;
-              font-size: 14px;
-              font-weight: 500;
-              margin-bottom: 4px;
-              color: var(--muted);
-            "
-            >名称</label
-          >
-          <input
-            type="text"
-            id="newName"
-            style="
-              width: 100%;
-              padding: 10px;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              box-sizing: border-box;
-              outline: none;
-            "
-          />
-        </div>
+          <div class="modal-field modal-field--dropdown">
+            <label for="newTag">标签</label>
+            <input
+              type="text"
+              id="newTag"
+              class="modal-input"
+              autocomplete="off"
+              placeholder="输入或选择分类"
+            />
 
-        <div style="margin-bottom: 16px; position: relative">
-          <label
-            style="
-              display: block;
-              font-size: 14px;
-              font-weight: 500;
-              margin-bottom: 4px;
-              color: var(--muted);
-            "
-            >标签</label
-          >
-          <input
-            type="text"
-            id="newTag"
-            autocomplete="off"
-            placeholder="输入或选择分类"
-            style="
-              width: 100%;
-              padding: 10px;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              box-sizing: border-box;
-              outline: none;
-              transition: border-color 0.2s;
-            "
-          />
+            <div id="tagDropdown" class="tag-dropdown"></div>
+          </div>
 
-          <div
-            id="tagDropdown"
-            style="
-              display: none;
-              position: absolute;
-              top: 100%;
-              left: 0;
-              right: 0;
-              background: white;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              margin-top: 4px;
-              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-              z-index: 110;
-              max-height: 150px;
-              overflow-y: auto;
-            "
-          ></div>
-        </div>
+          <div class="modal-field">
+            <label for="newContent">内容</label>
+            <textarea id="newContent" class="modal-textarea" rows="6"></textarea>
+          </div>
 
-        <div style="margin-bottom: 24px">
-          <label
-            style="
-              display: block;
-              font-size: 14px;
-              font-weight: 500;
-              margin-bottom: 4px;
-              color: var(--muted);
-            "
-            >内容</label
-          >
-          <textarea
-            id="newContent"
-            rows="6"
-            style="
-              width: 100%;
-              padding: 10px;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              box-sizing: border-box;
-              resize: none;
-              outline: none;
-              font-family: inherit;
-            "
-          ></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 12px">
-          <button
-            id="cancelBtn"
-            style="
-              padding: 10px 20px;
-              border: 1px solid var(--border);
-              border-radius: 12px;
-              background: white;
-              color: #64748b;
-              cursor: pointer;
-              font-weight: 500;
-            "
-          >
-            取消
-          </button>
-          <button
-            id="saveBtn"
-            style="
-              padding: 10px 24px;
-              border: none;
-              border-radius: 12px;
-              background: var(--accent);
-              color: white;
-              cursor: pointer;
-              font-weight: 500;
-            "
-          >
-            保存
-          </button>
+          <div class="prompt-modal-actions">
+            <button id="cancelBtn" class="ghost-btn">取消</button>
+            <button id="saveBtn" class="accent-btn">保存</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2719,102 +3227,26 @@
       </div>
     </div>
 
-    <div
-      id="webdavOverlay"
-      style="
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.32);
-        backdrop-filter: blur(12px);
-        z-index: 120;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-      "
-    >
-      <div class="webdav-modal" style="
-        width: 100%;
-        max-width: 480px;
-        max-height: calc(100vh - 80px);
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 20px;
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      ">
-        <!-- Header -->
-        <div style="
-          padding: 20px 24px 16px;
-          border-bottom: 1px solid var(--divider);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        ">
+    <div id="webdavOverlay">
+      <div class="webdav-modal system-modal-card system-modal-card--wide">
+        <div class="system-modal-header">
           <div>
-            <h2 style="
-              margin: 0;
-              font-size: 17px;
-              font-weight: 600;
-              color: var(--text);
-              letter-spacing: -0.2px;
-            ">同步与备份</h2>
-            <p style="
-              margin: 4px 0 0;
-              font-size: 13px;
-              color: var(--muted);
-            ">通过 WebDAV 在多设备间同步</p>
+            <h2 class="system-modal-title">同步与备份</h2>
+            <p class="system-modal-subtitle">通过 WebDAV 在多设备间同步</p>
           </div>
-          <button id="webdavClose" style="
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: rgba(120, 120, 128, 0.12);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--muted);
-            transition: all 0.2s ease;
-          ">✕</button>
+          <button id="webdavClose" class="hidden-tags-close">✕</button>
         </div>
 
-        <!-- Content -->
-        <div style="
-          padding: 20px 24px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-        ">
-          <!-- Connection Section -->
-          <div>
-            <div style="
-              font-size: 11px;
-              font-weight: 600;
-              color: var(--muted);
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-              margin-bottom: 12px;
-            ">连接设置</div>
-            
-            <div style="
-              background: rgba(120, 120, 128, 0.06);
-              border-radius: 12px;
-              padding: 16px;
-              display: flex;
-              flex-direction: column;
-              gap: 16px;
-            ">
+        <div class="system-modal-body">
+          <section class="system-section">
+            <div class="system-section-title">连接设置</div>
+            <div class="system-card">
               <div class="webdav-field">
                 <label class="webdav-label">服务器地址</label>
                 <input type="text" id="webdavUrl" class="webdav-input" placeholder="https://example.com/dav/" />
               </div>
-              
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+
+              <div class="system-grid-two">
                 <div class="webdav-field">
                   <label class="webdav-label">用户名</label>
                   <input type="text" id="webdavUsername" class="webdav-input" placeholder="用户名" />
@@ -2824,480 +3256,121 @@
                   <input type="password" id="webdavPassword" class="webdav-input" placeholder="密码" />
                 </div>
               </div>
-              
+
               <div class="webdav-field">
                 <label class="webdav-label">备份目录</label>
                 <input type="text" id="webdavDir" class="webdav-input" placeholder="prompt-box-backups" />
               </div>
-              
-              <button id="webdavTest" style="
-                align-self: flex-start;
-                padding: 8px 16px;
-                font-size: 13px;
-                font-weight: 500;
-                color: var(--accent);
-                background: transparent;
-                border: none;
-                cursor: pointer;
-                border-radius: 8px;
-                transition: all 0.2s ease;
-              ">测试连接</button>
-            </div>
-          </div>
 
-          <!-- Auto Backup Section -->
-          <div>
-            <div style="
-              font-size: 11px;
-              font-weight: 600;
-              color: var(--muted);
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-              margin-bottom: 12px;
-            ">自动备份</div>
-            
-            <div style="
-              background: rgba(120, 120, 128, 0.06);
-              border-radius: 12px;
-              padding: 16px;
-            ">
-              <div style="
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 16px;
-              ">
+              <button id="webdavTest" class="ghost-btn system-link-button">测试连接</button>
+            </div>
+          </section>
+
+          <section class="system-section">
+            <div class="system-section-title">自动备份</div>
+            <div class="system-card">
+              <div class="system-row-between">
                 <div>
-                  <div style="font-size: 14px; font-weight: 500; color: var(--text);">启用自动备份</div>
-                  <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">定期将数据备份到云端</div>
+                  <div class="system-field-title">启用自动备份</div>
+                  <div class="system-field-desc">定期将数据备份到云端</div>
                 </div>
                 <label class="switch">
                   <input type="checkbox" id="webdavAutoBackup" />
                   <span class="switch-slider"></span>
                 </label>
               </div>
-              
-              <div class="webdav-field" id="intervalField" style="display: none;">
+
+              <div class="webdav-field" id="intervalField">
                 <label class="webdav-label">备份频率（天）</label>
                 <input type="number" id="webdavIntervalDays" class="webdav-input" min="1" max="30" value="3" />
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- Actions Section -->
-          <div>
-            <div style="
-              font-size: 11px;
-              font-weight: 600;
-              color: var(--muted);
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-              margin-bottom: 12px;
-            ">手动操作</div>
-            
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button id="webdavBackup" style="
-                width: 100%;
-                padding: 12px;
-                font-size: 14px;
-                font-weight: 500;
-                color: white;
-                background: var(--accent);
-                border: none;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-              ">立即备份</button>
-              
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                <button id="webdavRestore" style="
-                  padding: 12px;
-                  font-size: 14px;
-                  font-weight: 500;
-                  color: var(--text);
-                  background: rgba(120, 120, 128, 0.08);
-                  border: none;
-                  border-radius: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s ease;
-                ">从云端恢复</button>
-                
-                <button id="webdavCopyConfig" style="
-                  padding: 12px;
-                  font-size: 14px;
-                  font-weight: 500;
-                  color: var(--text);
-                  background: rgba(120, 120, 128, 0.08);
-                  border: none;
-                  border-radius: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s ease;
-                ">复制配置</button>
-                
-                <button id="webdavPasteConfig" style="
-                  padding: 12px;
-                  font-size: 14px;
-                  font-weight: 500;
-                  color: var(--text);
-                  background: rgba(120, 120, 128, 0.08);
-                  border: none;
-                  border-radius: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s ease;
-                ">粘贴配置</button>
+          <section class="system-section">
+            <div class="system-section-title">手动操作</div>
+
+            <div class="system-stack">
+              <button id="webdavBackup" class="accent-btn system-primary-button">立即备份</button>
+
+              <div class="system-actions-three">
+                <button id="webdavRestore" class="ghost-btn system-secondary-button">从云端恢复</button>
+                <button id="webdavCopyConfig" class="ghost-btn system-secondary-button">复制配置</button>
+                <button id="webdavPasteConfig" class="ghost-btn system-secondary-button">粘贴配置</button>
               </div>
             </div>
 
-            <div style="
-              margin-top: 16px;
-              padding-top: 16px;
-              border-top: 1px solid var(--divider);
-            ">
-              <div style="
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 12px;
-                margin-bottom: 8px;
-              ">
-                <div style="
-                  font-size: 11px;
-                  font-weight: 600;
-                  color: var(--muted);
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                ">云端备份列表</div>
-                <div style="
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-                ">
-                  <div style="
-                    font-size: 12px;
-                    color: var(--muted);
-                  ">选择一项后恢复</div>
-                  <button id="webdavRefresh" style="
-                    padding: 6px 10px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: var(--text);
-                    background: rgba(120, 120, 128, 0.08);
-                    border: 1px solid var(--border);
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                  ">刷新</button>
+            <div class="system-card">
+              <div class="system-row-between">
+                <div class="system-section-title">云端备份列表</div>
+                <div class="system-row-hint">
+                  <div class="system-inline-note">选择一项后恢复</div>
+                  <button id="webdavRefresh" class="ghost-btn system-refresh-button">刷新</button>
                 </div>
               </div>
-              <select id="webdavBackupList" size="6" style="
-                width: 100%;
-                min-height: 168px;
-                padding: 10px 12px;
-                font-size: 13px;
-                color: var(--text);
-                background: rgba(255, 255, 255, 0.92);
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                outline: none;
-              "></select>
+
+              <select id="webdavBackupList" class="webdav-input system-select" size="6"></select>
             </div>
-          </div>
+          </section>
 
-          <!-- Hidden fields for compatibility -->
           <input type="hidden" id="webdavRestorePath" />
-          <textarea id="webdavConfigJson" style="display: none;"></textarea>
+          <textarea id="webdavConfigJson" class="system-hidden"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- Copy Config Modal -->
-    <div id="copyConfigOverlay" style="
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(12px);
-      z-index: 130;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-    ">
-      <div style="
-        width: 100%;
-        max-width: 400px;
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 20px;
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-      ">
-        <div style="
-          padding: 20px 24px 16px;
-          border-bottom: 1px solid var(--divider);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        ">
-          <h2 style="
-            margin: 0;
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.2px;
-          ">复制配置</h2>
-          <button id="copyConfigClose" style="
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: rgba(120, 120, 128, 0.12);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--muted);
-            transition: all 0.2s ease;
-          ">✕</button>
+    <div id="copyConfigOverlay">
+      <div class="system-modal-card system-modal-card--compact">
+        <div class="system-modal-header">
+          <h2 class="system-modal-title">复制配置</h2>
+          <button id="copyConfigClose" class="hidden-tags-close">✕</button>
         </div>
-        
-        <div style="padding: 20px 24px 24px;">
-          <p style="
-            margin: 0 0 16px;
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.5;
-          ">将以下配置复制到其他设备，即可快速完成同步设置。</p>
-          
-          <textarea id="copyConfigText" readonly style="
-            width: 100%;
-            height: 120px;
-            padding: 12px;
-            font-size: 13px;
-            font-family: 'SF Mono', Monaco, monospace;
-            color: var(--text);
-            background: rgba(120, 120, 128, 0.06);
-            border: 1px solid rgba(120, 120, 128, 0.12);
-            border-radius: 10px;
-            resize: none;
-            outline: none;
-            box-sizing: border-box;
-          "></textarea>
-          
-          <button id="copyConfigBtn" style="
-            width: 100%;
-            margin-top: 16px;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            color: white;
-            background: var(--accent);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-          ">复制到剪贴板</button>
+
+        <div class="system-modal-body">
+          <p class="system-modal-subtitle">将以下配置复制到其他设备，即可快速完成同步设置。</p>
+          <textarea id="copyConfigText" class="modal-textarea system-textarea" readonly></textarea>
+          <button id="copyConfigBtn" class="accent-btn system-primary-button">复制到剪贴板</button>
         </div>
       </div>
     </div>
 
-    <!-- Paste Config Modal -->
-    <div id="pasteConfigOverlay" style="
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(12px);
-      z-index: 130;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-    ">
-      <div style="
-        width: 100%;
-        max-width: 400px;
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 20px;
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-      ">
-        <div style="
-          padding: 20px 24px 16px;
-          border-bottom: 1px solid var(--divider);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        ">
-          <h2 style="
-            margin: 0;
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.2px;
-          ">粘贴配置</h2>
-          <button id="pasteConfigClose" style="
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: rgba(120, 120, 128, 0.12);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--muted);
-            transition: all 0.2s ease;
-          ">✕</button>
+    <div id="pasteConfigOverlay">
+      <div class="system-modal-card system-modal-card--compact">
+        <div class="system-modal-header">
+          <h2 class="system-modal-title">粘贴配置</h2>
+          <button id="pasteConfigClose" class="hidden-tags-close">✕</button>
         </div>
-        
-        <div style="padding: 20px 24px 24px;">
-          <p style="
-            margin: 0 0 16px;
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.5;
-          ">粘贴从其他设备复制的配置，快速完成同步设置。</p>
-          
-          <textarea id="pasteConfigText" style="
-            width: 100%;
-            height: 120px;
-            padding: 12px;
-            font-size: 13px;
-            font-family: 'SF Mono', Monaco, monospace;
-            color: var(--text);
-            background: white;
-            border: 1px solid rgba(120, 120, 128, 0.16);
-            border-radius: 10px;
-            resize: none;
-            outline: none;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-          " placeholder='{"version":"1.0","webdavConfig":{"url":"..."}}'></textarea>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px;">
-            <button id="pasteConfigCancel" style="
-              padding: 12px;
-              font-size: 14px;
-              font-weight: 500;
-              color: var(--text);
-              background: rgba(120, 120, 128, 0.08);
-              border: none;
-              border-radius: 10px;
-              cursor: pointer;
-              transition: all 0.2s ease;
-            ">取消</button>
-            <button id="pasteConfigApply" style="
-              padding: 12px;
-              font-size: 14px;
-              font-weight: 500;
-              color: white;
-              background: var(--accent);
-              border: none;
-              border-radius: 10px;
-              cursor: pointer;
-              transition: all 0.2s ease;
-            ">应用配置</button>
+
+        <div class="system-modal-body">
+          <p class="system-modal-subtitle">粘贴从其他设备复制的配置，快速完成同步设置。</p>
+          <textarea
+            id="pasteConfigText"
+            class="modal-textarea system-textarea"
+            placeholder='{"version":"1.0","webdavConfig":{"url":"..."}}'
+          ></textarea>
+
+          <div class="system-config-actions">
+            <button id="pasteConfigCancel" class="ghost-btn system-secondary-button">取消</button>
+            <button id="pasteConfigApply" class="accent-btn system-secondary-button">应用配置</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      id="toast"
-      style="
-        display: none;
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 20px;
-        font-size: 14px;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        transition: opacity 0.3s ease;
-      "
-    >
-      已复制到剪贴板
-    </div>
+    <div id="toast">已复制到剪贴板</div>
 
-    <!-- Context Menu -->
-    <div
-      id="contextMenu"
-      style="
-        display: none;
-        position: fixed;
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
-        padding: 6px 0;
-        min-width: 140px;
-        z-index: 1000;
-        backdrop-filter: blur(20px);
-        font-size: 13px;
-      "
-    >
-      <div
-        class="context-menu-item"
-        data-action="pin"
-        style="
-          padding: 8px 16px;
-          cursor: pointer;
-          color: var(--text);
-          transition: background 0.15s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        "
-        onmouseover="this.style.background='rgba(0,0,0,0.04)'"
-        onmouseout="this.style.background='transparent'"
-      >
-        <span style="font-size: 12px;">📌</span>
+    <div id="contextMenu" class="context-menu">
+      <div class="context-menu-item" data-action="pin">
+        <span class="context-menu-icon">📌</span>
         <span id="contextPinText">置顶</span>
       </div>
-      <div
-        class="context-menu-item"
-        data-action="edit"
-        style="
-          padding: 8px 16px;
-          cursor: pointer;
-          color: var(--text);
-          transition: background 0.15s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        "
-        onmouseover="this.style.background='rgba(0,0,0,0.04)'"
-        onmouseout="this.style.background='transparent'"
-      >
-        <span style="font-size: 12px;">✏️</span>
+      <div class="context-menu-item" data-action="edit">
+        <span class="context-menu-icon">✏️</span>
         <span>编辑</span>
       </div>
-      <div
-        style="
-          height: 1px;
-          background: var(--divider);
-          margin: 4px 8px;
-        "
-      ></div>
-      <div
-        class="context-menu-item"
-        data-action="delete"
-        style="
-          padding: 8px 16px;
-          cursor: pointer;
-          color: #ff3b30;
-          transition: background 0.15s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        "
-        onmouseover="this.style.background='rgba(255,59,48,0.08)'"
-        onmouseout="this.style.background='transparent'"
-      >
-        <span style="font-size: 12px;">🗑️</span>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item" data-action="delete">
+        <span class="context-menu-icon">🗑️</span>
         <span>删除</span>
       </div>
     </div>
