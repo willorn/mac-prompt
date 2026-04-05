@@ -742,7 +742,7 @@ function escapeHtml(value) {
           ? `你正在整理「${item.name || "未命名"}」，可在右侧完成置顶、编辑或删除。`
           : `你可以直接点击左侧卡片内容，或在这里确认内容后点击“立即使用”。`;
     }
-    if (previewUse) previewUse.disabled = false;
+    if (previewUse) previewUse.disabled = appMode === "manage";
     if (previewPin) {
       previewPin.textContent = item.isPinned ? "取消置顶" : "置顶";
       previewPin.disabled = false;
@@ -981,8 +981,10 @@ function escapeHtml(value) {
             e.preventDefault();
             selectCard(item.originalIndex);
             if (appMode === "manage") {
-              if (previewUse && !previewUse.disabled) {
-                previewUse.focus();
+              if (previewEdit && !previewEdit.disabled) {
+                previewEdit.focus();
+              } else if (previewPin && !previewPin.disabled) {
+                previewPin.focus();
               }
             } else {
               handleUsePrompt();
