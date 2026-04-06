@@ -1508,15 +1508,18 @@
       .mode-switch {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 6px;
+        gap: 0;
         margin: 2px 0 10px;
-        padding: 4px;
+        padding: 3px;
         background: rgba(255, 255, 255, 0.72);
         border: 1px solid #d9e4f2;
         border-radius: 12px;
+        overflow: hidden;
       }
 
       .mode-switch-btn {
+        width: 100%;
+        min-height: 34px;
         padding: 8px 10px !important;
         border: none !important;
         border-radius: 10px !important;
@@ -1992,18 +1995,33 @@
       }
 
       .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         width: 100%;
         justify-content: flex-end;
+      }
+
+      .card-tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 2px 8px;
+        font-size: 11px;
+        line-height: 1;
+        white-space: nowrap;
       }
 
       .card-hint {
         display: inline-flex;
         align-items: center;
+        min-height: 22px;
         padding: 2px 8px;
         border-radius: 999px;
         background: #edf3fb;
         color: #66758a;
-        font-size: 10px;
+        font-size: 11px;
+        line-height: 1;
         font-weight: 500;
         white-space: nowrap;
       }
@@ -2060,8 +2078,13 @@
       }
 
       body[data-app-mode="use"] #addBtn,
+      body[data-app-mode="use"] #addTagBtn,
       body[data-app-mode="use"] .manage-only {
         display: none !important;
+      }
+
+      body[data-app-mode="manage"] #addTagBtn {
+        display: block !important;
       }
 
       body[data-app-mode="manage"] .use-only {
@@ -2518,6 +2541,10 @@
       .card-body {
         font-size: 12.5px !important;
         line-height: 1.42 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       .card-footer {
@@ -2714,7 +2741,7 @@
 
       .sidebar-primary-btn {
         width: 100%;
-        margin-top: auto;
+        margin-top: 8px;
         padding: 12px;
       }
 

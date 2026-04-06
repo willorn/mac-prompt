@@ -141,6 +141,10 @@ function getUsageSummary(item) {
   };
 }
 
+function normalizeTag(tag) {
+  return typeof tag === "string" ? tag.trim() : "";
+}
+
 function comparePromptsForUse(a, b) {
   const lastUsedDiff = toTimestamp(b.lastUsedAt) - toTimestamp(a.lastUsedAt);
   if (lastUsedDiff !== 0) return lastUsedDiff;
@@ -171,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const listHeaderTitle = document.getElementById("listHeaderTitle");
   const modeUseBtn = document.getElementById("modeUseBtn");
   const modeManageBtn = document.getElementById("modeManageBtn");
+  const modeSwitch = document.getElementById("modeSwitch");
   const editModeIndicator = document.getElementById("editModeIndicator");
 
   const previewPanel = document.getElementById("previewPanel");
@@ -188,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewDelete = document.getElementById("previewDelete");
   const resultCount = document.getElementById("resultCount");
 
+  const addTagBtn = document.getElementById("addTagBtn");
   const tagInput = document.getElementById("newTag");
   const tagDropdown = document.getElementById("tagDropdown");
 
@@ -250,8 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let contextMenuTargetIndex = null;
   let renameTagOriginal = null;
   let appMode = "use";
-
-  const normalizeTag = (tag) => (typeof tag === "string" ? tag.trim() : "");
 
   function loadAppMode() {
     try {
@@ -330,6 +334,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getVisibleInAllCount() {
+    if (appMode === "manage") {
+      return allPrompts.length;
+    }
     return allPrompts.filter((item) => !isTagHidden(item.tag)).length;
   }
 
@@ -1004,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", () => {
         normalizedTag.toLowerCase().includes(term);
       const matchesCategory =
         activeFilter === "all"
-          ? !isTagHidden(normalizedTag)
+          ? (appMode === "manage" || !isTagHidden(normalizedTag))
           : normalizedTag === activeFilter;
 
       if (matchesSearch && matchesCategory) {
@@ -1104,7 +1111,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (appMode === "manage") {
-      regularItems.sort((a, b) => {
+      const manageItems = [
+        ...regularItems,
+        ...recentItems.map(({ card }) => card),
+      ];
+
+      manageItems.sort((a, b) => {
         const left = allPrompts[Number(a.dataset.originalIndex)];
         const right = allPrompts[Number(b.dataset.originalIndex)];
         return comparePromptsForManage(left, right);
@@ -1115,10 +1127,10 @@ document.addEventListener("DOMContentLoaded", () => {
         pinnedItems.forEach((card) => pinnedList.appendChild(card));
       }
 
-      if (regularItems.length > 0) {
+      if (manageItems.length > 0) {
         const regularTitle = activeFilter === "all" ? "全部提示词" : `${activeFilter} 分类`;
         const regularList = createSection(regularTitle, "点击查看详情，右侧进行整理");
-        regularItems.forEach((card) => regularList.appendChild(card));
+        manageItems.forEach((card) => regularList.appendChild(card));
       }
     } else {
       recentItems.sort((a, b) => comparePromptsForUse(a.item, b.item));
@@ -1265,6 +1277,20 @@ document.addEventListener("DOMContentLoaded", () => {
     resetForm();
     modal.style.display = "flex";
   };
+
+  if (addTagBtn) {
+    addTagBtn.onclick = () => {
+      resetForm();
+      modal.style.display = "flex";
+      if (tagInput) {
+        requestAnimationFrame(() => {
+          tagInput.focus();
+          tagInput.select();
+        });
+      }
+      showToast("输入新标签名称并保存提示词，即可创建分类");
+    };
+  }
 
   cancelBtn.onclick = () => (modal.style.display = "none");
 
@@ -1559,8 +1585,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function openCopyConfigModal() {
     if (!copyConfigOverlay || !copyConfigText) return;
     const config = collectWebdavConfig();
-    const json = JSON.stringify(buildWebdavSnapshot(config), null, 2);
-    copyConfigText.value = json;
+    copyConfigText.value = JSON.stringify(buildWebdavSnapshot(config), null, 2);
     copyConfigOverlay.style.display = "flex";
   }
 
@@ -1649,6 +1674,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (modeManageBtn) {
     modeManageBtn.onclick = () => setAppMode("manage");
+  }
+
+  if (modeSwitch) {
+    modeSwitch.addEventListener("click", (e) => {
+      if (e.target && e.target !== modeSwitch) return;
+      const rect = modeSwitch.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      setAppMode(clickX >= rect.width / 2 ? "manage" : "use");
+    });
   }
 
   function isTypingTarget(target) {
