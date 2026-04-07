@@ -1384,7 +1384,7 @@
 
       aside {
         width: 220px;
-        padding: 24px 16px 18px;
+        padding: 16px 16px 18px;
         background: var(--nb-surface-alt) !important;
         border-right: 1px solid #d9e4f2 !important;
         box-shadow: none !important;
@@ -1403,7 +1403,7 @@
       }
 
       .logo {
-        padding: 2px 2px 4px;
+        padding: 0 2px 2px;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -1484,8 +1484,8 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0;
-        margin: 0 0 8px;
-        padding: 3px;
+        margin: 0 0 6px;
+        padding: 2px;
         background: rgba(255, 255, 255, 0.72);
         border: 1px solid #d9e4f2;
         border-radius: 12px;
@@ -1494,8 +1494,8 @@
 
       .mode-switch-btn {
         width: 100%;
-        min-height: 34px;
-        padding: 8px 10px !important;
+        min-height: 30px;
+        padding: 6px 10px !important;
         border: none !important;
         border-radius: 10px !important;
         background: transparent !important;
@@ -1886,6 +1886,50 @@
         align-items: center;
         gap: 8px;
         flex-shrink: 0;
+      }
+
+      .preview-action-manage {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        max-width: 32px;
+        height: 32px;
+        padding: 0 9px !important;
+        overflow: hidden;
+        transition: max-width 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      }
+
+      .preview-action-manage:hover,
+      .preview-action-manage:focus-visible {
+        max-width: 88px;
+      }
+
+      .preview-action-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        min-width: 14px;
+        font-size: 13px;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+
+      .preview-action-label {
+        max-width: 0;
+        margin-left: 0;
+        opacity: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: max-width 0.18s ease, margin-left 0.18s ease, opacity 0.12s ease;
+      }
+
+      .preview-action-manage:hover .preview-action-label,
+      .preview-action-manage:focus-visible .preview-action-label {
+        max-width: 56px;
+        margin-left: 6px;
+        opacity: 1;
       }
 
       .preview-helper {
@@ -3124,9 +3168,18 @@
                     <span>立即使用</span>
                     <small>↵ 回车</small>
                   </button>
-                  <button class="ghost-btn manage-only" id="previewPin">置顶</button>
-                  <button class="ghost-btn manage-only" id="previewEdit">编辑</button>
-                  <button class="ghost-btn danger-btn manage-only" id="previewDelete">删除</button>
+                  <button class="ghost-btn manage-only preview-action-manage" id="previewPin" aria-label="置顶" title="置顶">
+                    <span class="preview-action-icon" aria-hidden="true">●</span>
+                    <span class="preview-action-label">置顶</span>
+                  </button>
+                  <button class="ghost-btn manage-only preview-action-manage" id="previewEdit" aria-label="编辑" title="编辑">
+                    <span class="preview-action-icon" aria-hidden="true">✎</span>
+                    <span class="preview-action-label">编辑</span>
+                  </button>
+                  <button class="ghost-btn danger-btn manage-only preview-action-manage" id="previewDelete" aria-label="删除" title="删除">
+                    <span class="preview-action-icon" aria-hidden="true">×</span>
+                    <span class="preview-action-label">删除</span>
+                  </button>
                 </div>
               </div>
               <div class="preview-title" id="previewTitle">准备调用提示词</div>

@@ -159,6 +159,19 @@ function comparePromptsForManage(a, b) {
   return String(a?.name || "").localeCompare(String(b?.name || ""), "zh-CN");
 }
 
+function setPreviewActionButtonLabel(button, label) {
+  if (!button) return;
+  const nextLabel = String(label ?? "").trim();
+  const labelEl = button.querySelector(".preview-action-label");
+  if (labelEl) {
+    labelEl.textContent = nextLabel;
+  } else {
+    button.textContent = nextLabel;
+  }
+  button.setAttribute("aria-label", nextLabel);
+  button.title = nextLabel;
+}
+
 function markPromptUsed(prompt) {
   if (!prompt || typeof prompt !== "object") return;
   prompt.useCount = Math.max(0, Number(prompt.useCount || 0)) + 1;
@@ -775,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (previewUse) previewUse.disabled = true;
     if (previewPin) {
-      previewPin.textContent = "置顶";
+      setPreviewActionButtonLabel(previewPin, "置顶");
       previewPin.disabled = true;
     }
     if (previewEdit) previewEdit.disabled = true;
@@ -814,7 +827,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (previewUse) previewUse.disabled = appMode === "manage";
     if (previewPin) {
-      previewPin.textContent = item.isPinned ? "取消置顶" : "置顶";
+      setPreviewActionButtonLabel(previewPin, item.isPinned ? "取消置顶" : "置顶");
       previewPin.disabled = false;
     }
     if (previewEdit) previewEdit.disabled = false;
