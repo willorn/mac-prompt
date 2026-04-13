@@ -7,6 +7,7 @@ import {
   ipcMain,
   Menu,
   screen,
+  shell,
   systemPreferences,
   Tray,
 } from "electron";
@@ -217,6 +218,61 @@ function runOsascript(lines) {
   });
 }
 
+function getAccessibilityTargetInfo() {
+  return {
+    targetName: app.isPackaged ? app.getName() : "Electron",
+    targetPath: process.execPath,
+    isPackaged: app.isPackaged,
+  };
+}
+
+function classifyAppleScriptPasteError(error) {
+  const message = String(error instanceof Error ? error.message : error || "");
+
+  if (
+    message.includes("(-1743)") ||
+    /not authorized to send apple events to system events/i.test(message)
+  ) {
+    return {
+      type: "automation",
+      message,
+    };
+  }
+
+  if (
+    message.includes("(-1719)") ||
+    /assistive access/i.test(message) ||
+    /not allowed assistive access/i.test(message) ||
+    /not allowed to send keystrokes/i.test(message)
+  ) {
+    return {
+      type: "accessibility",
+      message,
+    };
+  }
+
+  return {
+    type: "unknown",
+    message,
+  };
+}
+
+async function openPrivacySettingsPane(pane) {
+  if (process.platform !== "darwin") {
+    return false;
+  }
+
+  const url = `x-apple.systempreferences:com.apple.preference.security?${pane}`;
+
+  try {
+    await shell.openExternal(url);
+    return true;
+  } catch (error) {
+    console.error(`Open privacy pane failed: ${pane}`, error);
+    return false;
+  }
+}
+
 async function pasteClipboardToFrontmostApp() {
   if (process.platform !== "darwin") {
     return false;
@@ -239,9 +295,8 @@ function ensureAccessibilityPermission() {
   }
 
   systemPreferences.isTrustedAccessibilityClient(true);
-  const targetName = app.isPackaged ? app.getName() : "Electron";
-  const targetPath = process.execPath;
-  const detail = app.isPackaged
+  const { targetName, targetPath, isPackaged } = getAccessibilityTargetInfo();
+  const detail = isPackaged
     ? `请打开“系统设置 -> 隐私与安全性 -> 辅助功能”，启用“${targetName}”。\n\n授权后回到应用重试；如果仍然无效，重启应用后再试。`
     : `当前是开发模式，macOS 里通常需要启用的是“${targetName}”，不是“${app.getName()}”。\n\n` +
       `可执行文件路径：${targetPath}\n\n` +
@@ -294,8 +349,11 @@ function setupGlobalShortcut() {
   console.log("macOS 平台:", process.platform === 'darwin');
 
   if (!ok) {
+    const { targetName, targetPath, isPackaged } = getAccessibilityTargetInfo();
     const msg = process.platform === 'darwin'
-      ? "快捷键注册失败！\n\nmacOS 系统需要授予辅助功能权限才能使用全局快捷键。\n\n请打开: 系统设置 -> 隐私与安全性 -> 辅助功能 -> 添加 \"PromptBox\""
+      ? isPackaged
+        ? `快捷键注册失败！\n\nmacOS 系统需要授予辅助功能权限才能使用全局快捷键。\n\n请打开：系统设置 -> 隐私与安全性 -> 辅助功能 -> 启用“${targetName}”`
+        : `快捷键注册失败！\n\n当前是开发模式，请在“系统设置 -> 隐私与安全性 -> 辅助功能”里启用“${targetName}”，而不是“${app.getName()}”。\n\n可执行文件路径：${targetPath}`
       : "Alt+E 已被其他应用占用，请修改 main.js 中的快捷键组合。";
     dialog.showErrorBox("快捷键注册失败", msg);
   }
@@ -458,13 +516,37 @@ ipcMain.handle("copy-paste-prompt", async (_event, text) => {
     const pasted = await pasteClipboardToFrontmostApp();
     return { copied: true, pasted };
   } catch (error) {
-    console.error("Paste after hide failed", error);
+    const classified = classifyAppleScriptPasteError(error);
+    console.error("Paste after hide failed", classified.type, classified.message);
     return {
       copied: true,
       pasted: false,
-      error: error instanceof Error ? error.message : String(error),
+      requiresAccessibilityPermission: classified.type === "accessibility",
+      requiresAutomationPermission: classified.type === "automation",
+      automationTarget: classified.type === "automation" ? "System Events" : undefined,
+      error: classified.message,
     };
   }
+});
+
+ipcMain.handle("open-accessibility-settings", async () => {
+  return openPrivacySettingsPane("Privacy_Accessibility");
+});
+
+ipcMain.handle("open-automation-settings", async () => {
+  return openPrivacySettingsPane("Privacy_Automation");
+});
+
+ipcMain.handle("get-permission-diagnostics", () => {
+  const accessibilityTrusted =
+    process.platform === "darwin"
+      ? systemPreferences.isTrustedAccessibilityClient(false)
+      : true;
+  return {
+    platform: process.platform,
+    accessibilityTrusted,
+    ...getAccessibilityTargetInfo(),
+  };
 });
 
 ipcMain.handle("export-prompts", async (_event, content) => {

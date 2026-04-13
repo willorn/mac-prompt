@@ -3,6 +3,9 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electronAPI", {
   minimizeWindow: () => ipcRenderer.invoke("minimize-window"),
   copyPastePrompt: (text) => ipcRenderer.invoke("copy-paste-prompt", text),
+  openAccessibilitySettings: () => ipcRenderer.invoke("open-accessibility-settings"),
+  openAutomationSettings: () => ipcRenderer.invoke("open-automation-settings"),
+  getPermissionDiagnostics: () => ipcRenderer.invoke("get-permission-diagnostics"),
   exportPrompts: (content) => ipcRenderer.invoke("export-prompts", content),
   importPrompts: () => ipcRenderer.invoke("import-prompts"),
   getPrompts: () => ipcRenderer.invoke("get-prompts"),

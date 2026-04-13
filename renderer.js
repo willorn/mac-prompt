@@ -117,6 +117,24 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+async function openAccessibilitySettings() {
+  try {
+    assertElectron();
+    await electronAPI?.openAccessibilitySettings?.();
+  } catch (err) {
+    console.error("打开辅助功能设置失败", err);
+  }
+}
+
+async function openAutomationSettings() {
+  try {
+    assertElectron();
+    await electronAPI?.openAutomationSettings?.();
+  } catch (err) {
+    console.error("打开自动化设置失败", err);
+  }
+}
+
 function toTimestamp(value) {
   const time = Date.parse(value || "");
   return Number.isFinite(time) ? time : 0;
@@ -200,7 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewHelperText = document.getElementById("previewHelperText");
   const previewActionSummary = document.getElementById("previewActionSummary");
   const previewUsageStats = document.getElementById("previewUsageStats");
-  const previewUse = document.getElementById("previewUse");
   const previewPin = document.getElementById("previewPin");
   const previewEdit = document.getElementById("previewEdit");
   const previewDelete = document.getElementById("previewDelete");
@@ -772,7 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (previewActionSummary) {
       previewActionSummary.textContent =
-        appMode === "manage" ? "管理模式下仅选中与整理" : "单击左侧卡片立即使用";
+        appMode === "manage" ? "管理模式下仅选中与整理" : "单击卡片或按回车立即使用";
     }
     if (previewUsageStats) {
       previewUsageStats.textContent = "暂无使用记录";
@@ -786,7 +803,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "管理模式下点击列表只会选中，不会直接执行；请在右侧完成置顶、编辑或删除。"
           : "选中提示词后，单击卡片或按回车键即可立即使用，自动粘贴到当前输入框。";
     }
-    if (previewUse) previewUse.disabled = true;
     if (previewPin) {
       setPreviewActionButtonLabel(previewPin, "置顶");
       previewPin.disabled = true;
@@ -823,9 +839,8 @@ document.addEventListener("DOMContentLoaded", () => {
       previewHelperText.textContent =
         appMode === "manage"
           ? `你正在整理「${item.name || "未命名"}」，可在右侧完成置顶、编辑或删除。`
-          : `确认内容后，点击"立即使用"或直接按回车键，即可粘贴到当前输入框。`;
+          : "确认内容后，单击左侧卡片或直接按回车键，即可粘贴到当前输入框。";
     }
-    if (previewUse) previewUse.disabled = appMode === "manage";
     if (previewPin) {
       setPreviewActionButtonLabel(previewPin, item.isPinned ? "取消置顶" : "置顶");
       previewPin.disabled = false;
@@ -917,6 +932,9 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("已粘贴到当前输入位置");
     } else if (result.requiresAccessibilityPermission) {
       showToast("已复制，请先授予辅助功能权限");
+    } else if (result.requiresAutomationPermission) {
+      showToast("已复制，请允许 Electron 控制 System Events");
+      void openAutomationSettings();
     } else {
       showToast("已复制，未自动粘贴");
     }
@@ -1376,20 +1394,46 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (menuPermissions) {
-    menuPermissions.onclick = () => {
-      alert(
-        [
-          "权限说明",
-          "",
-          "1. 自动粘贴在 macOS 上通常需要“辅助功能”权限。",
-          "2. 全局快捷键 Alt+E 在部分机器上也可能依赖该权限。",
-          "3. 建议优先使用打包版 PromptBox.app 进行测试。",
-          "",
-          "路径：系统设置 → 隐私与安全性 → 辅助功能",
-          "",
-          "如果授权后仍无效，请完全退出应用后重新打开再试。",
-        ].join("\n"),
-      );
+    menuPermissions.onclick = async () => {
+      let diagnostics = null;
+      try {
+        assertElectron();
+        diagnostics = await electronAPI?.getPermissionDiagnostics?.();
+      } catch (err) {
+        console.error("读取权限诊断失败", err);
+      }
+
+      const targetName = diagnostics?.targetName || "Electron";
+      const targetPath = diagnostics?.targetPath || "未知";
+      const accessibilityTrusted = diagnostics?.accessibilityTrusted;
+      const isPackaged = Boolean(diagnostics?.isPackaged);
+      const detail = [
+        "权限说明",
+        "",
+        "1. 自动粘贴依赖两类 macOS 权限：",
+        "   - 辅助功能：允许发送键盘操作",
+        "   - 自动化：允许控制 System Events",
+        "2. 全局快捷键 Alt+E 在部分机器上也可能依赖辅助功能权限。",
+        isPackaged
+          ? `3. 当前运行目标：${targetName}`
+          : `3. 当前是开发模式，应授权“${targetName}”，不是“PromptBox”。`,
+        `4. 可执行文件路径：${targetPath}`,
+        accessibilityTrusted === false
+          ? "5. 当前检测结果：辅助功能尚未授权。"
+          : accessibilityTrusted === true
+            ? "5. 当前检测结果：辅助功能已授权；若仍无法自动粘贴，请检查“自动化 -> Electron -> System Events”。"
+            : "5. 当前检测结果：暂时无法读取辅助功能状态。",
+        "",
+        "点击“确定”后将尝试打开“辅助功能”设置页。",
+        "若辅助功能已开但仍不能自动粘贴，再到“自动化”里允许 Electron 控制 System Events。",
+      ].join("\n");
+
+      alert(detail);
+      if (accessibilityTrusted === false) {
+        await openAccessibilitySettings();
+      } else {
+        await openAutomationSettings();
+      }
       if (moreMenu) moreMenu.style.display = "none";
     };
   }
@@ -1449,13 +1493,6 @@ document.addEventListener("DOMContentLoaded", () => {
     previewEdit.onclick = () => {
       if (selectedIndex === null) return;
       openEditModal(selectedIndex);
-    };
-  }
-
-  if (previewUse) {
-    previewUse.onclick = async () => {
-      if (selectedIndex === null) return;
-      await usePromptAtIndex(selectedIndex);
     };
   }
 

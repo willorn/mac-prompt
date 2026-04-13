@@ -2066,17 +2066,12 @@
         box-shadow: none !important;
       }
 
-      #previewUse,
       #previewPin,
       #previewDelete {
         padding: 6px 10px !important;
         font-size: 12px !important;
         white-space: nowrap;
         box-shadow: none !important;
-      }
-
-      #previewUse {
-        background: var(--nb-accent-soft-strong) !important;
       }
 
       .danger-btn {
@@ -2150,43 +2145,7 @@
 
       /* Preview Panel: Use mode optimizations */
       body[data-app-mode="use"] .preview-actions-inline {
-        gap: 0;
-      }
-
-      body[data-app-mode="use"] #previewUse {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-        min-height: 40px;
-        padding: 10px 18px !important;
-        font-family: "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
-        font-size: 14px !important;
-        line-height: 1.1;
-        letter-spacing: 0;
-        font-weight: 600;
-        white-space: nowrap;
-        min-width: 116px;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 18px rgba(79, 140, 255, 0.22) !important;
-        transition: all 0.2s ease;
-      }
-
-      body[data-app-mode="use"] #previewUse:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 24px rgba(79, 140, 255, 0.28) !important;
-      }
-
-      body[data-app-mode="use"] #previewUse small {
-        font-size: 11px;
-        opacity: 0.8;
-        font-weight: 500;
-      }
-
-      body[data-app-mode="use"] #previewUse:disabled {
-        opacity: 0.5;
-        transform: none !important;
-        box-shadow: none !important;
+        display: none;
       }
 
       body[data-app-mode="manage"] #editModeIndicator {
@@ -2657,14 +2616,6 @@
 
       .preview-helper-text {
         font-size: 12px !important;
-      }
-
-      #previewUse {
-        background: var(--pb-accent) !important;
-        color: #fff !important;
-        border-color: transparent !important;
-        font-family: "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
-        text-rendering: geometricPrecision;
       }
 
       #previewPin,
@@ -3164,10 +3115,6 @@
                   <span class="preview-mode" id="previewMode">请选择一条提示词</span>
                 </div>
                 <div class="preview-actions-inline">
-                  <button class="accent-btn use-only" id="previewUse">
-                    <span>立即使用</span>
-                    <small>↵ 回车</small>
-                  </button>
                   <button class="ghost-btn manage-only preview-action-manage" id="previewPin" aria-label="置顶" title="置顶">
                     <span class="preview-action-icon" aria-hidden="true">●</span>
                     <span class="preview-action-label">置顶</span>
@@ -3188,7 +3135,7 @@
             <div class="preview-summary">
               <div class="summary-card">
                 <div class="summary-label">执行方式</div>
-                <div class="summary-value" id="previewActionSummary">单击左侧卡片立即使用</div>
+                <div class="summary-value" id="previewActionSummary">单击卡片或按回车立即使用</div>
               </div>
               <div class="summary-card">
                 <div class="summary-label">使用记录</div>
