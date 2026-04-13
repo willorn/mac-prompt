@@ -87,6 +87,12 @@ let tray = null;
 let isHiddenOffscreen = false;
 let isQuitting = false;
 
+function keepDockHidden() {
+  if (process.platform === "darwin") {
+    app.dock?.hide();
+  }
+}
+
 function createMainWindow() {
   const saved = store.get("bounds");
   const isMaximized = store.get("isMaximized");
@@ -99,6 +105,7 @@ function createMainWindow() {
     minWidth: 980,
     minHeight: 650,
     show: true,
+    skipTaskbar: process.platform === "darwin",
     webPreferences: {
       preload: getAssetPath("preload.cjs"),
       contextIsolation: true,
@@ -140,8 +147,9 @@ function showMainWindow() {
     mainWindow.setBounds(saved);
   }
 
+  keepDockHidden();
   mainWindow.setOpacity(1);
-  mainWindow.setSkipTaskbar(false);
+  mainWindow.setSkipTaskbar(process.platform === "darwin");
   mainWindow.show();
   if (mainWindow.isMinimized()) {
     mainWindow.restore();
@@ -175,7 +183,8 @@ function hideMainWindow() {
   if (process.platform === 'darwin') {
     app.hide();
   }
-  
+
+  keepDockHidden();
   mainWindow.setOpacity(0);
   mainWindow.setSkipTaskbar(true);
   mainWindow.setBounds(
@@ -293,6 +302,7 @@ function setupGlobalShortcut() {
 }
 
 app.whenReady().then(() => {
+  keepDockHidden();
   createMainWindow();
   setupGlobalShortcut();
   try {

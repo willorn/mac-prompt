@@ -38,7 +38,10 @@
       "output": "dist"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "extendInfo": {
+        "LSUIElement": true
+      }
     },
     "asar": true
   }

@@ -846,6 +846,51 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePreview(item);
   }
 
+  function getVisibleCards() {
+    return Array.from(document.querySelectorAll(".card"));
+  }
+
+  function focusAdjacentCard(step) {
+    const cards = getVisibleCards();
+    if (cards.length === 0) return false;
+
+    const activeCard = document.activeElement?.closest?.(".card") || null;
+    let currentIndex = activeCard ? cards.indexOf(activeCard) : -1;
+
+    if (currentIndex === -1 && selectedIndex !== null) {
+      currentIndex = cards.findIndex(
+        (card) => Number(card.dataset.originalIndex) === selectedIndex,
+      );
+    }
+
+    let nextIndex;
+    if (currentIndex === -1) {
+      nextIndex = step > 0 ? 0 : cards.length - 1;
+    } else {
+      nextIndex = (currentIndex + step + cards.length) % cards.length;
+    }
+
+    const nextCard = cards[nextIndex];
+    if (!nextCard) return false;
+
+    nextCard.focus();
+    selectCard(Number(nextCard.dataset.originalIndex));
+    return true;
+  }
+
+  function isBlockingLayerOpen() {
+    return (
+      contextMenu?.style.display === "block" ||
+      moreMenu?.style.display === "block" ||
+      modal?.style.display === "flex" ||
+      pasteConfigOverlay?.style.display === "flex" ||
+      copyConfigOverlay?.style.display === "flex" ||
+      renameTagOverlay?.style.display === "flex" ||
+      hiddenTagsOverlay?.style.display === "flex" ||
+      webdavOverlay?.style.display === "flex"
+    );
+  }
+
   async function usePromptAtIndex(index, card = null) {
     const item = allPrompts[index];
     if (!item) return null;
@@ -1228,7 +1273,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === "Tab" || e.key === "ArrowDown") {
+    if (e.key === "Enter" || e.key === "Tab") {
       const firstCard = document.querySelector(".card");
       if (firstCard) {
         firstCard.focus();
@@ -1760,6 +1805,17 @@ document.addEventListener("DOMContentLoaded", () => {
         moreMenu.style.display = moreMenu.style.display === "block" ? "none" : "block";
       }
       return;
+    }
+
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      const isSearchFocused = e.target === searchInput;
+      if (!isBlockingLayerOpen() && (!isTypingTarget(e.target) || isSearchFocused)) {
+        const moved = focusAdjacentCard(e.key === "ArrowDown" ? 1 : -1);
+        if (moved) {
+          e.preventDefault();
+          return;
+        }
+      }
     }
 
     if (e.key === "/" && !isTypingTarget(e.target)) {
