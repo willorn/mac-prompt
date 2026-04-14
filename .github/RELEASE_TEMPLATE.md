@@ -1,17 +1,19 @@
 # PromptBox v{VERSION}
 
-## 🎉 新版本发布
+## 下载安装
 
-### 下载安装包
+- macOS (Apple Silicon): `PromptBox-{VERSION}-arm64.dmg`
 
-| 平台 | 下载链接 | 文件大小 |
-|------|----------|----------|
-| macOS (Intel) | `Prompt-Master-{VERSION}-x64.dmg` | {SIZE} |
-| macOS (Apple Silicon) | `Prompt-Master-{VERSION}-arm64.dmg` | {SIZE} |
-| Windows | `Prompt-Master-{VERSION}.exe` | {SIZE} |
-| Linux | `Prompt-Master-{VERSION}.AppImage` | {SIZE} |
+当前阶段 GitHub Release 默认只上传 `dmg` 安装包。
 
-### ✨ 新功能
+如果后续接入自动更新，再额外上传：
+
+- `latest-mac.yml`
+- `PromptBox-{VERSION}-arm64.dmg.blockmap`
+
+## 本次更新
+
+### ✨ 新增
 
 - 
 
@@ -23,42 +25,16 @@
 
 - 
 
-### 🔧 其他
-
-- 
-
----
-
 ## 安装说明
 
-### macOS
-
 1. 下载 `.dmg` 文件
-2. 双击打开，将应用拖到 Applications 文件夹
-3. 首次打开可能需要在「系统偏好设置 → 安全性与隐私」中允许
-
-### Windows
-
-1. 下载 `.exe` 文件
-2. 双击运行安装程序
-3. 按提示完成安装
-
-### Linux
-
-1. 下载 `.AppImage` 文件
-2. 赋予执行权限：`chmod +x Prompt-Master-{VERSION}.AppImage`
-3. 双击运行或命令行执行
-
----
+2. 双击打开，将应用拖到 `Applications`
+3. 首次打开若遇到系统安全提示，按 macOS 指引允许打开
 
 ## 验证安装
 
-安装后，按 `Alt+E` 应该可以呼出应用窗口。
+安装后按 `Alt+E`，应用窗口应能正常呼出。
 
 ## 反馈问题
 
-如果遇到问题，请在 [Issues](https://github.com/willorn/prompt-box-electron/issues) 页面提交。
-
-## 更新日志
-
-查看完整更新日志：[CHANGELOG.md](../CHANGELOG.md)
+如果遇到问题，请在 [Issues](https://github.com/willorn/mac-prompt/issues) 页面提交。

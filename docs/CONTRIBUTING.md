@@ -10,7 +10,7 @@
 
 ## 🐛 提交 Bug
 
-如果你发现了 Bug，请通过 [GitHub Issues](https://github.com/willorn/prompt-box-electron/issues) 提交，并包含以下信息：
+如果你发现了 Bug，请通过 [GitHub Issues](https://github.com/willorn/mac-prompt/issues) 提交，并包含以下信息：
 
 1. **问题描述** - 清晰描述发生了什么
 2. **复现步骤** - 详细步骤说明如何复现
@@ -41,8 +41,8 @@
 
 ```bash
 # 1. Fork 并克隆项目
-git clone https://github.com/willorn/prompt-box-electron.git
-cd prompt-box-electron
+git clone https://github.com/willorn/mac-prompt.git
+cd mac-prompt
 
 # 2. 安装依赖
 bun install
@@ -132,9 +132,13 @@ docs: 更新 WebDAV 配置说明
 - 添加使用示例
 - 翻译（计划支持多语言）
 
+## 🚢 版本发布
+
+版本发布不要临时发挥，统一按 [发布流程](./RELEASE.md) 执行。
+
 ## 🎯 开发计划
 
-查看 [Projects](https://github.com/willorn/prompt-box-electron/projects) 了解当前开发计划和优先级。
+查看仓库主页和 Issues 了解当前开发计划和优先级。
 
 ## ❓ 需要帮助？
 

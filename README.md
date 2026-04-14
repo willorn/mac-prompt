@@ -21,7 +21,7 @@
 
 ### 下载安装
 
-前往 [Releases](https://github.com/willorn/prompt-box-electron/releases) 页面下载最新版本：
+前往 [Releases](https://github.com/willorn/mac-prompt/releases) 页面下载最新版本：
 
 - **macOS**: `PromptBox-x.x.x.dmg`
 - **Windows**: `PromptBox-x.x.x.exe` (计划中)
@@ -31,8 +31,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/willorn/prompt-box-electron.git
-cd prompt-box-electron
+git clone https://github.com/willorn/mac-prompt.git
+cd mac-prompt
 
 # 安装依赖
 bun install
@@ -132,12 +132,13 @@ bun run build
 ## 📁 项目结构
 
 ```
-prompt-box-electron/
+mac-prompt/
 ├── assets/                 # 静态资源
 │   └── trayTemplate.png    # 托盘图标
 ├── docs/                   # 文档
 │   ├── CHANGELOG.md        # 更新日志
 │   ├── CONTRIBUTING.md     # 贡献指南
+│   ├── RELEASE.md          # 发布流程
 │   └── WEBDAV.md           # WebDAV 配置说明
 ├── index.html             # 主界面
 ├── main.js                # 主进程
@@ -150,6 +151,10 @@ prompt-box-electron/
 ## 🤝 贡献指南
 
 欢迎提交 Issue 和 Pull Request！请阅读 [贡献指南](docs/CONTRIBUTING.md) 了解详情。
+
+## 🚢 发布流程
+
+版本发布统一按 [发布流程](docs/RELEASE.md) 执行。
 
 ## 📝 更新日志
 
