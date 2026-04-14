@@ -1881,6 +1881,10 @@
         white-space: nowrap;
       }
 
+      body[data-app-mode="use"] #previewMode {
+        display: none;
+      }
+
       .preview-actions-inline {
         display: inline-flex;
         align-items: center;
@@ -2570,36 +2574,12 @@
         line-height: 1.68 !important;
       }
 
-      .preview-summary {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .summary-card {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
+      .preview-usage-stats {
         min-width: 0;
-        padding: 12px 14px;
-        border: 1px solid var(--pb-accent-border);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.88);
-      }
-
-      .summary-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--pb-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-      }
-
-      .summary-value {
-        min-width: 0;
-        font-size: 12.5px;
+        margin-top: -4px;
+        font-size: 11.5px;
         line-height: 1.5;
-        color: var(--pb-text);
+        color: var(--pb-muted);
       }
 
       .preview-helper {
@@ -3112,7 +3092,7 @@
               <div class="preview-topbar">
                 <div class="preview-meta-line">
                   <span class="preview-tag" id="previewTag">未选择</span>
-                  <span class="preview-mode" id="previewMode">请选择一条提示词</span>
+                  <span class="preview-mode" id="previewMode">请选择要整理的提示词</span>
                 </div>
                 <div class="preview-actions-inline">
                   <button class="ghost-btn manage-only preview-action-manage" id="previewPin" aria-label="置顶" title="置顶">
@@ -3132,20 +3112,7 @@
               <div class="preview-title" id="previewTitle">准备调用提示词</div>
             </div>
             <div class="preview-body" id="previewBody">先移动鼠标或键盘选中一条提示词，再单击卡片立即发送到当前输入框。</div>
-            <div class="preview-summary">
-              <div class="summary-card">
-                <div class="summary-label">执行方式</div>
-                <div class="summary-value" id="previewActionSummary">单击卡片或按回车立即使用</div>
-              </div>
-              <div class="summary-card">
-                <div class="summary-label">使用记录</div>
-                <div class="summary-value" id="previewUsageStats">暂无使用记录</div>
-              </div>
-            </div>
-            <div class="preview-helper">
-              <div class="preview-helper-title" id="previewHelperTitle">使用提示</div>
-              <div class="preview-helper-text" id="previewHelperText">选择一条提示词后，可在当前页面快速确认内容并执行。</div>
-            </div>
+            <div class="preview-usage-stats" id="previewUsageStats">暂无使用记录</div>
           </section>
         </div>
       </main>

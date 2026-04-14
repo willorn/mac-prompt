@@ -214,9 +214,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewBody = document.getElementById("previewBody");
   const previewTag = document.getElementById("previewTag");
   const previewMode = document.getElementById("previewMode");
-  const previewHelperTitle = document.getElementById("previewHelperTitle");
-  const previewHelperText = document.getElementById("previewHelperText");
-  const previewActionSummary = document.getElementById("previewActionSummary");
   const previewUsageStats = document.getElementById("previewUsageStats");
   const previewPin = document.getElementById("previewPin");
   const previewEdit = document.getElementById("previewEdit");
@@ -785,23 +782,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (previewTag) previewTag.textContent = "未选择";
     if (previewMode) {
       previewMode.textContent =
-        appMode === "manage" ? "请选择要整理的提示词" : "请选择一条提示词";
-    }
-    if (previewActionSummary) {
-      previewActionSummary.textContent =
-        appMode === "manage" ? "管理模式下仅选中与整理" : "单击卡片或按回车立即使用";
+        appMode === "manage" ? "请选择要整理的提示词" : "";
     }
     if (previewUsageStats) {
       previewUsageStats.textContent = "暂无使用记录";
-    }
-    if (previewHelperTitle) {
-      previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
-    }
-    if (previewHelperText) {
-      previewHelperText.textContent =
-        appMode === "manage"
-          ? "管理模式下点击列表只会选中，不会直接执行；请在右侧完成置顶、编辑或删除。"
-          : "选中提示词后，单击卡片或按回车键即可立即使用，自动粘贴到当前输入框。";
     }
     if (previewPin) {
       setPreviewActionButtonLabel(previewPin, "置顶");
@@ -823,23 +807,10 @@ document.addEventListener("DOMContentLoaded", () => {
       previewMode.textContent =
         appMode === "manage"
           ? "当前为管理模式：点击卡片只选中，不会直接执行"
-          : "当前为使用模式：单击卡片立即执行，回车也可使用";
-    }
-    if (previewActionSummary) {
-      previewActionSummary.textContent =
-        appMode === "manage" ? "在此完成置顶、编辑或删除" : "单击左侧卡片，立即返回原输入框";
+          : "";
     }
     if (previewUsageStats) {
       previewUsageStats.textContent = `${useText} · ${lastUsedText}`;
-    }
-    if (previewHelperTitle) {
-      previewHelperTitle.textContent = appMode === "manage" ? "整理提示" : "使用提示";
-    }
-    if (previewHelperText) {
-      previewHelperText.textContent =
-        appMode === "manage"
-          ? `你正在整理「${item.name || "未命名"}」，可在右侧完成置顶、编辑或删除。`
-          : "确认内容后，单击左侧卡片或直接按回车键，即可粘贴到当前输入框。";
     }
     if (previewPin) {
       setPreviewActionButtonLabel(previewPin, item.isPinned ? "取消置顶" : "置顶");
