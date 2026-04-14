@@ -1257,11 +1257,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
+  function clearSearchInput({ focus = false } = {}) {
+    const hadValue = searchInput.value.length > 0;
+    if (hadValue) {
+      searchInput.value = "";
+      renderCards();
+    }
+    if (focus) {
+      searchInput.focus();
+    }
+    return hadValue;
+  }
+
   searchInput.addEventListener("input", () => {
     renderCards();
   });
 
   searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && searchInput.value) {
+      e.preventDefault();
+      e.stopPropagation();
+      clearSearchInput({ focus: true });
+      return;
+    }
     if (e.key === "Enter" || e.key === "Tab") {
       const firstCard = document.querySelector(".card");
       if (firstCard) {
@@ -1842,8 +1860,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (electronAPI?.onFocusSearch) {
     electronAPI.onFocusSearch(() => {
+      if (appMode !== "manage") {
+        clearSearchInput();
+      }
       searchInput.focus();
-      searchInput.select();
+      if (searchInput.value) {
+        searchInput.select();
+      }
     });
   }
 
